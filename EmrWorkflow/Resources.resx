@@ -1,0 +1,234 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="DebugStepArg" xml:space="preserve">
+    <value>s3://elasticmapreduce/libs/state-pusher/0.1/fetch</value>
+  </data>
+  <data name="DebugStepJarPath" xml:space="preserve">
+    <value>s3://elasticmapreduce/libs/script-runner/script-runner.jar</value>
+  </data>
+  <data name="DebugStepName" xml:space="preserve">
+    <value>Start debugging</value>
+  </data>
+  <data name="E_BootstrapactionNameIsMissing" xml:space="preserve">
+    <value>Name property is missing for the BootstrapAction. Example: "upload libs"</value>
+  </data>
+  <data name="E_BootstrapactionPathIsMissing" xml:space="preserve">
+    <value>Path property is missing for the BootstrapAction. Example: "s3://mapreduceBucket/bootstrap/action.sh"</value>
+  </data>
+  <data name="E_ClusterTagKeyIsMissing" xml:space="preserve">
+    <value>Key property is missing for the Cluster Tag. Example: "Contact"</value>
+  </data>
+  <data name="E_ClusterTagValueIsMissing" xml:space="preserve">
+    <value>Value property is missing for the Cluster Tag. Example: "SupperSlonic.com"</value>
+  </data>
+  <data name="E_HBaseBackupPathIsMissing" xml:space="preserve">
+    <value>BackupPath property is missing for the HBase Backup Step. Example: "s3://myBucket/hBaseBackup"</value>
+  </data>
+  <data name="E_HBaseJarPathIsMissing" xml:space="preserve">
+    <value>JarPath property is missing for the HBase Configuration. Example: "/home/hadoop/lib/hbase-0.94.7.jar"</value>
+  </data>
+  <data name="E_HBaseRestorePathIsMissing" xml:space="preserve">
+    <value>RestorePath property is missing for the HBase Restore Step. Example: "s3://myBucket/hBaseRestore"</value>
+  </data>
+  <data name="E_JobFlowAmiVersionIsMissing" xml:space="preserve">
+    <value>AmiVersion property is missing for the JobFlow. Examples: "latest", "3.0.3"</value>
+  </data>
+  <data name="E_JobFlowEc2KeyNameIsMissing" xml:space="preserve">
+    <value>Ec2KeyName property is missing for the JobFlow. Example: "testEC2Key"</value>
+  </data>
+  <data name="E_JobFlowHadoopVersionIsMissing" xml:space="preserve">
+    <value>HadoopVersion property is missing for the JobFlow. Example: "2.2.0"</value>
+  </data>
+  <data name="E_JobFlowInstanceCountShouldBePositive" xml:space="preserve">
+    <value>InstanceCount property of the JobFlow should be positive. Example: "34"</value>
+  </data>
+  <data name="E_JobFlowLogUriIsMissing" xml:space="preserve">
+    <value>LogUri property is missing for the JobFlow. Example: "s3://myBucket/logs"</value>
+  </data>
+  <data name="E_JobFlowMasterInstanceTypeIsMissing" xml:space="preserve">
+    <value>MasterInstanceType property is missing for the JobFlow. Example: "m1.medium"</value>
+  </data>
+  <data name="E_JobFlowNameIsMissing" xml:space="preserve">
+    <value>Name property is missing for the JobFlow. Example: "my super job 1"</value>
+  </data>
+  <data name="E_JobFlowSlaveInstanceTypeIsMissing" xml:space="preserve">
+    <value>SlaveInstanceType property is missing for the JobFlow. Example: "m3.2xlarge"</value>
+  </data>
+  <data name="E_StepJarPathIsMissing" xml:space="preserve">
+    <value>JarPath property is missing for the Step. Example: "s3://mapreduceBucket/jar/myPackage.jar"</value>
+  </data>
+  <data name="E_StepNameIsMissing" xml:space="preserve">
+    <value>Name property is missing for the Step. Example: "map-reduce job 1"</value>
+  </data>
+  <data name="E_UnsupportedXmlElement" xml:space="preserve">
+    <value>Unsupported element "{0}"</value>
+  </data>
+  <data name="FailToRunJobTemplate" xml:space="preserve">
+    <value>Fail to run job... Error: {0}</value>
+  </data>
+  <data name="HadoopConfigName" xml:space="preserve">
+    <value>Configure Hadoop</value>
+  </data>
+  <data name="HadoopConfigPath" xml:space="preserve">
+    <value>s3://elasticmapreduce/bootstrap-actions/configure-hadoop</value>
+  </data>
+  <data name="HBaseBackupStepName" xml:space="preserve">
+    <value>Backup HBase</value>
+  </data>
+  <data name="HBaseConfigName" xml:space="preserve">
+    <value>Configure HBase</value>
+  </data>
+  <data name="HBaseConfigPath" xml:space="preserve">
+    <value>s3://elasticmapreduce/bootstrap-actions/configure-hbase</value>
+  </data>
+  <data name="HBaseDaemonsConfigName" xml:space="preserve">
+    <value>Configure HBase Daemons</value>
+  </data>
+  <data name="HBaseDaemonsConfigPath" xml:space="preserve">
+    <value>s3://elasticmapreduce/bootstrap-actions/configure-hbase-daemons</value>
+  </data>
+  <data name="HBaseInstallName" xml:space="preserve">
+    <value>Install HBase</value>
+  </data>
+  <data name="HBaseInstallPath" xml:space="preserve">
+    <value>s3://elasticmapreduce/bootstrap-actions/setup-hbase</value>
+  </data>
+  <data name="HBaseMainClass" xml:space="preserve">
+    <value>emr.hbase.backup.Main</value>
+  </data>
+  <data name="HBaseRestoreStepName" xml:space="preserve">
+    <value>Restore HBase</value>
+  </data>
+  <data name="HBaseStepName" xml:space="preserve">
+    <value>Start HBase</value>
+  </data>
+  <data name="JobCurrentStateTemplate" xml:space="preserve">
+    <value>Job {0} is still in progress
+Master URL:	{1}
+Latest State:	{2}
+Latest Step:	{3}</value>
+  </data>
+  <data name="MasterPublicDnsNameNotDefined" xml:space="preserve">
+    <value>not yet defined</value>
+  </data>
+  <data name="RunningStepNotDefined" xml:space="preserve">
+    <value>no running step</value>
+  </data>
+</root>

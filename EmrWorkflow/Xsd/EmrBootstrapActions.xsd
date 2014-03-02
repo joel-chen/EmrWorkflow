@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:emrWfl="urn:supperslonic:emrWorkflow" targetNamespace="urn:supperslonic:emrWorkflow" elementFormDefault="qualified" id="emrBootstrapActions">
+
+  <xs:include id="emrBootstrapAction" schemaLocation="EmrBootstrapAction.xsd" />
+  <xs:element name="bootstrapActions" type="emrWfl:bootstrapActionListType"/>
+
+</xs:schema>

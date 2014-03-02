@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:emrWfl="urn:supperslonic:emrWorkflow" targetNamespace="urn:supperslonic:emrWorkflow" elementFormDefault="qualified" id="emrConfigs">
+
+  <xs:include id="emrConfig" schemaLocation="EmrConfig.xsd" />
+  <xs:element name="config" type="emrWfl:configType"/>
+  
+</xs:schema>

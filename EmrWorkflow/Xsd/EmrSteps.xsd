@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:emrWfl="urn:supperslonic:emrWorkflow" targetNamespace="urn:supperslonic:emrWorkflow" elementFormDefault="qualified" id="emrSteps">
+
+  <xs:include id="emrStep" schemaLocation="EmrStep.xsd" /> 
+  <xs:element name="steps" type="emrWfl:stepType"/>
+  
+</xs:schema>

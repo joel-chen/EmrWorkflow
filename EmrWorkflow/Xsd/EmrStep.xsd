@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:emrWfl="urn:supperslonic:emrWorkflow" targetNamespace="urn:supperslonic:emrWorkflow" elementFormDefault="qualified" id="emrStep">
+
+  <xs:complexType name="stepType">
+    <xs:choice minOccurs="1" maxOccurs="unbounded">
+      <xs:element name="jarStep" type="emrWfl:jarStepType"/>
+      <xs:element name="restoreHBase" type="emrWfl:hBasePathType"/>
+      <xs:element name="backupHBase" type="emrWfl:hBasePathType"/>
+    </xs:choice>
+  </xs:complexType>
+  
+  <xs:complexType name="jarStepType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1" />
+      <xs:element name="jar" type="xs:string" minOccurs="1" maxOccurs="1" />
+      <xs:element name="actionOnFailure" minOccurs="0" maxOccurs="1">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="TERMINATE_JOB_FLOW"></xs:enumeration>
+            <xs:enumeration value="CANCEL_AND_WAIT"></xs:enumeration>
+            <xs:enumeration value="CONTINUE"></xs:enumeration>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="mainClass" type="xs:string" minOccurs="0" maxOccurs="1" />
+      <xs:element name="arg" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="hBasePathType">
+    <xs:attribute name="path" type="xs:string" use="required" />
+  </xs:complexType>
+	
+</xs:schema>

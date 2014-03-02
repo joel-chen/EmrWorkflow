@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:emrWfl="urn:supperslonic:emrWorkflow" targetNamespace="urn:supperslonic:emrWorkflow" elementFormDefault="qualified" id="emrTag">
+
+  <xs:complexType name="tagsListType">
+    <xs:sequence>
+      <xs:element name="tag" type="emrWfl:keyValueType" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="keyValueType">
+    <xs:sequence>
+      <xs:element name="key" type="xs:string" minOccurs="1" maxOccurs="1" />
+      <xs:element name="value" type="xs:string" minOccurs="1" maxOccurs="1" />
+    </xs:sequence>
+  </xs:complexType>
+  
+</xs:schema>

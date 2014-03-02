@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:emrWfl="urn:supperslonic:emrWorkflow" targetNamespace="urn:supperslonic:emrWorkflow" elementFormDefault="qualified" id="emrConfig">
+
+  <xs:complexType name="configType">
+    <xs:choice>
+      <xs:sequence>
+        <xs:element name="debugConfig" type="emrWfl:debugConfigType" maxOccurs="1"/>
+        <xs:element name="hadoopConfig" type="emrWfl:argsListType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="hBaseConfig" type="emrWfl:hBaseConfigType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:sequence>
+        <xs:element name="hadoopConfig" type="emrWfl:argsListType" maxOccurs="1"/>
+        <xs:element name="hBaseConfig" type="emrWfl:hBaseConfigType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:sequence>
+        <xs:element name="hBaseConfig" type="emrWfl:hBaseConfigType" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="debugConfigType">
+    <xs:attribute name="start" type="xs:boolean" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="hBaseConfigType">
+    <xs:sequence>
+      <xs:element name="jar" type="xs:string" minOccurs="1" maxOccurs="1" />
+      <xs:element name="arg" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="hBaseDaemondsConfig" type="emrWfl:argsListType" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+    <xs:attribute name="start" type="xs:boolean" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="argsListType">
+    <xs:sequence>
+      <xs:element name="arg" type="xs:string" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  
+</xs:schema>
