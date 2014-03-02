@@ -103,7 +103,7 @@ namespace EmrWorkflow.Run
             }
             else if (activityInfo.CurrentState == EmrActivityState.Failed)
             {
-                this.PrintError(activityInfo);
+                EmrJobRunner.PrintError(activityInfo);
                 this.EmrActivitiesIterator.NotifyJobFailed();
             }
 
@@ -132,13 +132,13 @@ namespace EmrWorkflow.Run
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception during sending the request: " + ex.Message);
+                EmrJobRunner.PrintError("Exception during sending the request: " + ex.Message);
                 return false;
             }
 
             if (!pushResult)
             {
-                Console.WriteLine("Request failed...");
+                EmrJobRunner.PrintError("Request failed...");
                 return false;
             }
 
@@ -151,10 +151,17 @@ namespace EmrWorkflow.Run
             this.threadTimer = null;
         }
 
-        private void PrintError(EmrActivityInfo activityInfo)
+        private static void PrintError(EmrActivityInfo activityInfo)
         {
             String errorMessage = activityInfo.JobFlowDetail.ExecutionStatusDetail.LastStateChangeReason;
-            Console.WriteLine(String.Format(Resources.FailToRunJobTemplate, errorMessage));
+            EmrJobRunner.PrintError(String.Format(Resources.FailToRunJobTemplate, errorMessage));
+        }
+
+        private static void PrintError(string errorMessage)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(errorMessage);
+            Console.ResetColor();
         }
 
         private void PrintJobInfo(EmrActivityInfo activityInfo)
