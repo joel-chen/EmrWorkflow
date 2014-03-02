@@ -4,13 +4,12 @@ using EmrWorkflow.RequestBuilders;
 using EmrWorkflow.Run.Model;
 using EmrWorkflow.Run.Strategies;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace EmrWorkflow.Run
 {
-    public abstract class EmrJobRunner
+    public class EmrJobRunner
     {
         private const int timerPeriod = 60000 * 1; //every 1 minute
 
@@ -25,22 +24,35 @@ namespace EmrWorkflow.Run
         private Timer threadTimer;
 
         /// <summary>
-        /// Current activity index in the list <see cref="EmrActivities"/>
+        /// Constructor
         /// </summary>
-        private int currentActivityIndex;
-
-        public EmrJobRunner()
+        /// <param name="settings">Settings to replace placeholders</param>
+        /// <param name="emrClient">Instantiated EMR Client to make requests to the Amazon EMR Service</param>
+        /// <param name="emrActivitiesIterator">Iterator through the job flow's activities</param>
+        public EmrJobRunner(BuilderSettings settings, AmazonElasticMapReduceClient emrClient, EmrActivitiesIterator emrActivitiesIterator)
         {
-            this.currentActivityIndex = 0;
             this.isBusy = 0;
             this.threadTimer = new Timer(this.CheckStatus);
+
+            this.Settings = settings;
+            this.EmrClient = emrClient;
+            this.EmrActivitiesIterator = emrActivitiesIterator;
         }
 
+
+        /// <summary>
+        /// If the job is running
+        /// </summary>
         public bool IsRunning
         {
             get { return this.threadTimer != null; }
         }
 
+        /// <summary>
+        /// Current job flow's id.
+        /// Is set automatically after submitting a new job to EMR.
+        /// If the job already exists, should be set manually.
+        /// </summary>
         public string JobFlowId
         {
             get { return this.Settings.Get(BuilderSettings.JobFlowId); }
@@ -50,12 +62,24 @@ namespace EmrWorkflow.Run
             }
         }
 
-        public abstract BuilderSettings Settings { get; }
+        /// <summary>
+        /// Settings to replace placeholders
+        /// </summary>
+        public BuilderSettings Settings { get; set; }
 
-        public abstract AmazonElasticMapReduceClient EmrClient { get; }
+        /// <summary>
+        /// Instantiated EMR Client to make requests to the Amazon EMR Service
+        /// </summary>
+        public AmazonElasticMapReduceClient EmrClient { get; set; }
 
-        public abstract IList<EmrActivityStrategy> EmrActivities { get; }
+        /// <summary>
+        /// Iterator through the job flow's activities
+        /// </summary>
+        public EmrActivitiesIterator EmrActivitiesIterator { get; set; }
 
+        /// <summary>
+        /// Start the job flow
+        /// </summary>
         public async void Run()
         {
             if ((await this.PushNextActivity()))
@@ -64,18 +88,43 @@ namespace EmrWorkflow.Run
                 this.StopRunning();
         }
 
+        private async void CheckStatus(Object stateInfo)
+        {
+            if (Interlocked.CompareExchange(ref this.isBusy, 1, 0) != 0)
+                return;
+
+            Console.WriteLine("--------------------------");
+            EmrJobStateChecker jobStateChecker = new EmrJobStateChecker();
+            EmrActivityInfo activityInfo = jobStateChecker.Check(this.EmrClient, this.JobFlowId);
+
+            if (activityInfo.CurrentState == EmrActivityState.Running)
+            {
+                this.PrintJobInfo(activityInfo);
+            }
+            else if (activityInfo.CurrentState == EmrActivityState.Failed)
+            {
+                this.PrintError(activityInfo);
+                this.EmrActivitiesIterator.NotifyJobFailed();
+            }
+
+            if (!(await this.PushNextActivity()))
+                this.StopRunning();
+
+            Interlocked.Exchange(ref this.isBusy, 0);
+        }
+
         private async Task<bool> PushNextActivity()
         {
-            if (this.currentActivityIndex == this.EmrActivities.Count)
+            if (!this.EmrActivitiesIterator.MoveNext)
             {
                 Console.WriteLine("Done...");
                 return false;
             }
 
-            //TODO: add retry cycle
-            EmrActivityStrategy activity = this.EmrActivities[this.currentActivityIndex];
+            EmrActivityStrategy activity = this.EmrActivitiesIterator.Current;
             Console.WriteLine("Adding activity: " + activity.Name);
 
+            //TODO: probably add a retry cycle
             bool pushResult;
             try
             {
@@ -93,42 +142,19 @@ namespace EmrWorkflow.Run
                 return false;
             }
 
-            this.currentActivityIndex++;
             return true;
-        }
-
-        private async void CheckStatus(Object stateInfo)
-        {
-            if (Interlocked.CompareExchange(ref this.isBusy, 1, 0) != 0)
-                return;
-
-            Console.WriteLine("--------------------------");
-            EmrJobStateChecker jobStateChecker = new EmrJobStateChecker();
-            EmrActivityInfo activityInfo = jobStateChecker.Check(this.EmrClient, this.JobFlowId);
-
-            if (activityInfo.CurrentState == EmrActivityState.Running)
-            {
-                this.PrintJobInfo(activityInfo);
-            }
-            else if (activityInfo.CurrentState == EmrActivityState.Completed)
-            {
-                if (!(await this.PushNextActivity()))
-                    this.StopRunning();
-            }
-            else if (activityInfo.CurrentState == EmrActivityState.Failed)
-            {
-                String errorMessage = activityInfo.JobFlowDetail.ExecutionStatusDetail.LastStateChangeReason;
-                Console.WriteLine(String.Format(Resources.FailToRunJobTemplate, errorMessage));
-                this.StopRunning();
-            }
-
-            Interlocked.Exchange(ref this.isBusy, 0);
         }
 
         private void StopRunning()
         {
             this.threadTimer.Dispose();
             this.threadTimer = null;
+        }
+
+        private void PrintError(EmrActivityInfo activityInfo)
+        {
+            String errorMessage = activityInfo.JobFlowDetail.ExecutionStatusDetail.LastStateChangeReason;
+            Console.WriteLine(String.Format(Resources.FailToRunJobTemplate, errorMessage));
         }
 
         private void PrintJobInfo(EmrActivityInfo activityInfo)

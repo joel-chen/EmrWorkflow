@@ -71,6 +71,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Run\EmrActivitiesIterator.cs" />
     <Compile Include="Run\EmrJobRunner.cs" />
     <Compile Include="Run\EmrJobStateChecker.cs" />
     <Compile Include="Run\Model\EmrActivityInfo.cs" />
