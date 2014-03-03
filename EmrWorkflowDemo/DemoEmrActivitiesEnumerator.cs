@@ -9,33 +9,20 @@ using System.Xml;
 
 namespace EmrWorkflowDemo
 {
-    public class DemoEmrActivitiesIterator : EmrActivitiesEnumerator
+    public class DemoEmrActivitiesEnumerator : EmrActivitiesEnumerator
     {
-        private bool hasError = false;
-
-        public IEnumerator<EmrActivityStrategy> GetActivities(EmrJobRunner emrRunner)
+        protected override IEnumerable<EmrActivityStrategy> SuccessFlow(EmrJobRunner emrRunner)
         {
             if (String.IsNullOrEmpty(emrRunner.JobFlowId))
                 yield return this.CreateStartActivity();
 
             yield return this.CreateAddStepsActivity();
-            yield return this.CreateAddStepsActivity();
-            yield return this.CreateAddStepsActivity();
             yield return this.CreateTerminateActivity("Job succeeded. terminate cluster");
         }
 
-        public void NotifyJobFailed(EmrJobRunner emrRunner)
+        protected override IEnumerable<EmrActivityStrategy> FailedFlow(EmrJobRunner emrRunner)
         {
-            this.hasError = true;
-        }
-
-        private IEnumerator<EmrActivityStrategy> GetFlow(EmrActivityStrategy goodFlowActiviy)
-        {
-            if (!hasError)
-                yield return goodFlowActiviy;
-
             yield return this.CreateTerminateActivity("Job failed. terminate cluster");
-            yield break;
         }
 
         private EmrActivityStrategy CreateStartActivity()

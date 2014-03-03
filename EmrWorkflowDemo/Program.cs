@@ -11,9 +11,10 @@ namespace EmrWorkflowDemo
     {
         public static void Main(string[] args)
         {
+            
             BuilderSettings settings = Program.CreateSettings();
             AmazonElasticMapReduceClient emrClient = Program.CreateEmrClient();
-            DemoEmrActivitiesIterator activitiesIterator = new DemoEmrActivitiesIterator();
+            DemoEmrActivitiesEnumerator activitiesIterator = new DemoEmrActivitiesEnumerator();
 
             using (EmrJobRunner emrRunner = new EmrJobRunner(settings, emrClient, activitiesIterator))
             {

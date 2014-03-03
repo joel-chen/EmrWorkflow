@@ -172,7 +172,16 @@ namespace EmrWorkflow.Run
         {
             // Attempt to move the disposable state from 0 to 1. If successful, we can be assured that
             // this thread is the first thread to do so, and can safely dispose of the object.
-            if (Interlocked.CompareExchange(ref this.disposableState, 1, 0) == 0)
+            if (Interlocked.CompareExchange(ref this.disposableState, 1, 0) != 0)
+                return;
+
+            if (this.activities != null)
+            {
+                this.activities.Dispose();
+                this.activities = null;
+            }
+
+            if (this.threadTimer != null)
             {
                 this.threadTimer.Dispose();
                 this.threadTimer = null;
