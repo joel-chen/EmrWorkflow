@@ -15,11 +15,11 @@ namespace EmrWorkflow.Run
 
         public IEnumerator<EmrActivityStrategy> GetActivities(EmrJobRunner emrRunner)
         {
-            foreach (EmrActivityStrategy successFlowActivity in this.SuccessFlow(emrRunner))
+            foreach (EmrActivityStrategy successFlowActivity in this.GetNormalFlow(emrRunner))
             {
                 if (this.hasError)
                 {
-                    foreach (EmrActivityStrategy failedFlowActivity in this.FailedFlow(emrRunner))
+                    foreach (EmrActivityStrategy failedFlowActivity in this.GetFailedFlow(emrRunner))
                     {
                         yield return failedFlowActivity;
                     }
@@ -48,13 +48,13 @@ namespace EmrWorkflow.Run
         /// </summary>
         /// <param name="emrRunner">Reference to the emrRunner</param>
         /// <returns>Sequence of good activities</returns>
-        protected abstract IEnumerable<EmrActivityStrategy> SuccessFlow(EmrJobRunner emrRunner);
+        protected abstract IEnumerable<EmrActivityStrategy> GetNormalFlow(EmrJobRunner emrRunner);
 
         /// <summary>
         /// A sequence of activities, if an error has occurred
         /// </summary>
         /// <param name="emrRunner">Reference to the emrRunner</param>
         /// <returns>Sequence of bad activities</returns>
-        protected abstract IEnumerable<EmrActivityStrategy> FailedFlow(EmrJobRunner emrRunner);
+        protected abstract IEnumerable<EmrActivityStrategy> GetFailedFlow(EmrJobRunner emrRunner);
     }
 }

@@ -11,7 +11,7 @@ namespace EmrWorkflowDemo
 {
     public class DemoEmrActivitiesEnumerator : EmrActivitiesEnumerator
     {
-        protected override IEnumerable<EmrActivityStrategy> SuccessFlow(EmrJobRunner emrRunner)
+        protected override IEnumerable<EmrActivityStrategy> GetNormalFlow(EmrJobRunner emrRunner)
         {
             if (String.IsNullOrEmpty(emrRunner.JobFlowId))
                 yield return this.CreateStartActivity();
@@ -20,7 +20,7 @@ namespace EmrWorkflowDemo
             yield return new TerminateJobStrategy("Job succeeded. terminate cluster");
         }
 
-        protected override IEnumerable<EmrActivityStrategy> FailedFlow(EmrJobRunner emrRunner)
+        protected override IEnumerable<EmrActivityStrategy> GetFailedFlow(EmrJobRunner emrRunner)
         {
             yield return new TerminateJobStrategy("Job failed. terminate cluster");
         }
