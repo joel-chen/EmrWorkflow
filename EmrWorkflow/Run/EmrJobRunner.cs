@@ -26,6 +26,11 @@ namespace EmrWorkflow.Run
         private int disposableState;
 
         /// <summary>
+        /// Timer for calling <see cref="CheckStatus"/> method
+        /// </summary>
+        private Timer threadTimer;
+
+        /// <summary>
         /// Internal field to indicate if job had errors
         /// </summary>
         private bool hasErrors;
@@ -34,11 +39,6 @@ namespace EmrWorkflow.Run
         /// A reference to the activities list from the <see cref="EmrActivitiesEnumerator"/>
         /// </summary>
         private IEnumerator<EmrActivityStrategy> activities;
-
-        /// <summary>
-        /// Timer for calling <see cref="CheckStatus"/> method
-        /// </summary>
-        private Timer threadTimer;
 
         /// <summary>
         /// Constructor
@@ -99,7 +99,7 @@ namespace EmrWorkflow.Run
         /// </summary>
         public async void Run()
         {
-            this.activities = this.EmrActivitiesEnumerator.GetActivities(this);
+            this.activities = this.EmrActivitiesEnumerator.GetActivities(this).GetEnumerator();
 
             if ((await this.PushNextActivity()))
                 this.threadTimer.Change(0, timerPeriod);
@@ -186,6 +186,8 @@ namespace EmrWorkflow.Run
                 this.threadTimer.Dispose();
                 this.threadTimer = null;
             }
+
+            GC.SuppressFinalize(this);
         }
     }
 }

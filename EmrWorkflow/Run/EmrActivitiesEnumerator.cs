@@ -13,7 +13,7 @@ namespace EmrWorkflow.Run
         /// </summary>
         private bool hasError = false;
 
-        public IEnumerator<EmrActivityStrategy> GetActivities(EmrJobRunner emrRunner)
+        public IEnumerable<EmrActivityStrategy> GetActivities(EmrJobRunner emrRunner)
         {
             foreach (EmrActivityStrategy successFlowActivity in this.GetNormalFlow(emrRunner))
             {
