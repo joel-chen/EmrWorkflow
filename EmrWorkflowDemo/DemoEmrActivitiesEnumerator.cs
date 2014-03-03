@@ -17,12 +17,12 @@ namespace EmrWorkflowDemo
                 yield return this.CreateStartActivity();
 
             yield return this.CreateAddStepsActivity();
-            yield return this.CreateTerminateActivity("Job succeeded. terminate cluster");
+            yield return new TerminateJobStrategy("Job succeeded. terminate cluster");
         }
 
         protected override IEnumerable<EmrActivityStrategy> FailedFlow(EmrJobRunner emrRunner)
         {
-            yield return this.CreateTerminateActivity("Job failed. terminate cluster");
+            yield return new TerminateJobStrategy("Job failed. terminate cluster");
         }
 
         private EmrActivityStrategy CreateStartActivity()
@@ -41,11 +41,6 @@ namespace EmrWorkflowDemo
             IList<StepBase> steps = new StepsXmlFactory().ReadXml(stepsXml.OuterXml);
 
             return new AddStepsStrategy("first activity", steps);
-        }
-
-        private EmrActivityStrategy CreateTerminateActivity(string name)
-        {
-            return new TerminateJobStrategy(name);
         }
     }
 }
