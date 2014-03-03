@@ -180,8 +180,9 @@
   <data name="E_UnsupportedXmlElement" xml:space="preserve">
     <value>Unsupported element "{0}"</value>
   </data>
-  <data name="FailToRunJobTemplate" xml:space="preserve">
-    <value>Fail to run job... Error: {0}</value>
+  <data name="Info_FailToRunJobTemplate" xml:space="preserve">
+    <value>The latest step failed...
+The job's latest state: {0}</value>
   </data>
   <data name="HadoopConfigName" xml:space="preserve">
     <value>Configure Hadoop</value>
@@ -219,16 +220,36 @@
   <data name="HBaseStepName" xml:space="preserve">
     <value>Start HBase</value>
   </data>
-  <data name="JobCurrentStateTemplate" xml:space="preserve">
-    <value>Job {0} is still in progress
-Master URL:	{1}
-Latest State:	{2}
-Latest Step:	{3}</value>
+  <data name="Info_JobCurrentStateTemplate" xml:space="preserve">
+    <value>Latest Step:	{0}
+Latest State:	{1}
+Master URL:	{2}</value>
   </data>
-  <data name="MasterPublicDnsNameNotDefined" xml:space="preserve">
+  <data name="Info_MasterPublicDnsNameNotDefined" xml:space="preserve">
     <value>not yet defined</value>
   </data>
-  <data name="RunningStepNotDefined" xml:space="preserve">
+  <data name="Info_RunningStepNotDefined" xml:space="preserve">
     <value>no running step</value>
+  </data>
+  <data name="Info_AddingActivityTemplate" xml:space="preserve">
+    <value>Adding activity: {0}</value>
+  </data>
+  <data name="Info_CheckingJobStatus" xml:space="preserve">
+    <value>--------------------------</value>
+  </data>
+  <data name="Info_CompletedSuccessfully" xml:space="preserve">
+    <value>Completed successfully...</value>
+  </data>
+  <data name="Info_CompletedWithErrors" xml:space="preserve">
+    <value>Completed with errors...</value>
+  </data>
+  <data name="Info_EmrServiceNotOkResponse" xml:space="preserve">
+    <value>EMR Service returned not OK response code</value>
+  </data>
+  <data name="Info_ExceptionWhenSendingRequestTemplate" xml:space="preserve">
+    <value>Exception during sending the request: {0}</value>
+  </data>
+  <data name="Info_JobFlowId" xml:space="preserve">
+    <value>Job id:		</value>
   </data>
 </root>

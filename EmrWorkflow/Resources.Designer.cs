@@ -250,15 +250,6 @@ namespace EmrWorkflow {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fail to run job... Error: {0}.
-        /// </summary>
-        internal static string FailToRunJobTemplate {
-            get {
-                return ResourceManager.GetString("FailToRunJobTemplate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Configure Hadoop.
         /// </summary>
         internal static string HadoopConfigName {
@@ -367,32 +358,104 @@ namespace EmrWorkflow {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Job {0} is still in progress
-        ///Master URL:	{1}
-        ///Latest State:	{2}
-        ///Latest Step:	{3}.
+        ///   Looks up a localized string similar to Adding activity: {0}.
         /// </summary>
-        internal static string JobCurrentStateTemplate {
+        internal static string Info_AddingActivityTemplate {
             get {
-                return ResourceManager.GetString("JobCurrentStateTemplate", resourceCulture);
+                return ResourceManager.GetString("Info_AddingActivityTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to --------------------------.
+        /// </summary>
+        internal static string Info_CheckingJobStatus {
+            get {
+                return ResourceManager.GetString("Info_CheckingJobStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Completed successfully....
+        /// </summary>
+        internal static string Info_CompletedSuccessfully {
+            get {
+                return ResourceManager.GetString("Info_CompletedSuccessfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Completed with errors....
+        /// </summary>
+        internal static string Info_CompletedWithErrors {
+            get {
+                return ResourceManager.GetString("Info_CompletedWithErrors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EMR Service returned not OK response code.
+        /// </summary>
+        internal static string Info_EmrServiceNotOkResponse {
+            get {
+                return ResourceManager.GetString("Info_EmrServiceNotOkResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exception during sending the request: {0}.
+        /// </summary>
+        internal static string Info_ExceptionWhenSendingRequestTemplate {
+            get {
+                return ResourceManager.GetString("Info_ExceptionWhenSendingRequestTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The latest step failed...
+        ///The job&apos;s latest state: {0}.
+        /// </summary>
+        internal static string Info_FailToRunJobTemplate {
+            get {
+                return ResourceManager.GetString("Info_FailToRunJobTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Latest Step:	{0}
+        ///Latest State:	{1}
+        ///Master URL:	{2}.
+        /// </summary>
+        internal static string Info_JobCurrentStateTemplate {
+            get {
+                return ResourceManager.GetString("Info_JobCurrentStateTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Job id:		.
+        /// </summary>
+        internal static string Info_JobFlowId {
+            get {
+                return ResourceManager.GetString("Info_JobFlowId", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to not yet defined.
         /// </summary>
-        internal static string MasterPublicDnsNameNotDefined {
+        internal static string Info_MasterPublicDnsNameNotDefined {
             get {
-                return ResourceManager.GetString("MasterPublicDnsNameNotDefined", resourceCulture);
+                return ResourceManager.GetString("Info_MasterPublicDnsNameNotDefined", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to no running step.
         /// </summary>
-        internal static string RunningStepNotDefined {
+        internal static string Info_RunningStepNotDefined {
             get {
-                return ResourceManager.GetString("RunningStepNotDefined", resourceCulture);
+                return ResourceManager.GetString("Info_RunningStepNotDefined", resourceCulture);
             }
         }
     }

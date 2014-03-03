@@ -4,12 +4,13 @@ using EmrWorkflow.RequestBuilders;
 using EmrWorkflow.Run.Model;
 using EmrWorkflow.Run.Strategies;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace EmrWorkflow.Run
 {
-    public class EmrJobRunner
+    public class EmrJobRunner : IDisposable
     {
         private const int timerPeriod = 60000 * 1; //every 1 minute
 
@@ -17,6 +18,22 @@ namespace EmrWorkflow.Run
         /// Internal field used for sync access to the <see cref="CheckStatus"/> method called by the timer
         /// </summary>
         private int isBusy;
+
+        /// <summary>
+        /// A value which indicates the disposable state. 0 indicates undisposed, 1 indicates disposing
+        /// or disposed.
+        /// </summary>
+        private int disposableState;
+
+        /// <summary>
+        /// Internal field to indicate if job had errors
+        /// </summary>
+        private bool hasErrors;
+
+        /// <summary>
+        /// A reference to the activities list from the <see cref="EmrActivitiesEnumerator"/>
+        /// </summary>
+        private IEnumerator<EmrActivityStrategy> activities;
 
         /// <summary>
         /// Timer for calling <see cref="CheckStatus"/> method
@@ -28,24 +45,24 @@ namespace EmrWorkflow.Run
         /// </summary>
         /// <param name="settings">Settings to replace placeholders</param>
         /// <param name="emrClient">Instantiated EMR Client to make requests to the Amazon EMR Service</param>
-        /// <param name="emrActivitiesIterator">Iterator through the job flow's activities</param>
-        public EmrJobRunner(BuilderSettings settings, AmazonElasticMapReduceClient emrClient, EmrActivitiesIterator emrActivitiesIterator)
+        /// <param name="emrActivitiesEnumerator">Iterator through the job flow's activities</param>
+        public EmrJobRunner(BuilderSettings settings, AmazonElasticMapReduceClient emrClient, EmrActivitiesEnumerator emrActivitiesEnumerator)
         {
             this.isBusy = 0;
+            this.hasErrors = false;
             this.threadTimer = new Timer(this.CheckStatus);
 
             this.Settings = settings;
             this.EmrClient = emrClient;
-            this.EmrActivitiesIterator = emrActivitiesIterator;
+            this.EmrActivitiesEnumerator = emrActivitiesEnumerator;
         }
-
 
         /// <summary>
         /// If the job is running
         /// </summary>
         public bool IsRunning
         {
-            get { return this.threadTimer != null; }
+            get { return Thread.VolatileRead(ref this.disposableState) == 0; }
         }
 
         /// <summary>
@@ -75,17 +92,19 @@ namespace EmrWorkflow.Run
         /// <summary>
         /// Iterator through the job flow's activities
         /// </summary>
-        public EmrActivitiesIterator EmrActivitiesIterator { get; set; }
+        public EmrActivitiesEnumerator EmrActivitiesEnumerator { get; set; }
 
         /// <summary>
         /// Start the job flow
         /// </summary>
         public async void Run()
         {
+            this.activities = this.EmrActivitiesEnumerator.GetActivities(this);
+
             if ((await this.PushNextActivity()))
                 this.threadTimer.Change(0, timerPeriod);
             else
-                this.StopRunning();
+                this.Dispose();
         }
 
         private async void CheckStatus(Object stateInfo)
@@ -93,36 +112,40 @@ namespace EmrWorkflow.Run
             if (Interlocked.CompareExchange(ref this.isBusy, 1, 0) != 0)
                 return;
 
-            Console.WriteLine("--------------------------");
+            EmrJobLogger.PrintCheckingStatus();
             EmrJobStateChecker jobStateChecker = new EmrJobStateChecker();
             EmrActivityInfo activityInfo = jobStateChecker.Check(this.EmrClient, this.JobFlowId);
 
             if (activityInfo.CurrentState == EmrActivityState.Running)
             {
-                this.PrintJobInfo(activityInfo);
+                EmrJobLogger.PrintJobInfo(activityInfo);
             }
-            else if (activityInfo.CurrentState == EmrActivityState.Failed)
+            else
             {
-                EmrJobRunner.PrintError(activityInfo);
-                this.EmrActivitiesIterator.NotifyJobFailed();
-            }
+                if (activityInfo.CurrentState == EmrActivityState.Failed)
+                {
+                    this.hasErrors = true;
+                    EmrJobLogger.PrintError(activityInfo);
+                    this.EmrActivitiesEnumerator.NotifyJobFailed(this);
+                }
 
-            if (!(await this.PushNextActivity()))
-                this.StopRunning();
+                if (!(await this.PushNextActivity()))
+                    this.Dispose();
+            }
 
             Interlocked.Exchange(ref this.isBusy, 0);
         }
 
         private async Task<bool> PushNextActivity()
         {
-            if (!this.EmrActivitiesIterator.MoveNext)
+            if (!this.activities.MoveNext())
             {
-                Console.WriteLine("Done...");
+                EmrJobLogger.PrintCompleted(this.hasErrors);
                 return false;
             }
 
-            EmrActivityStrategy activity = this.EmrActivitiesIterator.Current;
-            Console.WriteLine("Adding activity: " + activity.Name);
+            EmrActivityStrategy activity = this.activities.Current;
+            EmrJobLogger.PrintAddingNewActivity(activity);
 
             //TODO: probably add a retry cycle
             bool pushResult;
@@ -132,56 +155,28 @@ namespace EmrWorkflow.Run
             }
             catch (Exception ex)
             {
-                EmrJobRunner.PrintError("Exception during sending the request: " + ex.Message);
+                EmrJobLogger.PrintError(String.Format(Resources.Info_ExceptionWhenSendingRequestTemplate, ex.Message));
                 return false;
             }
 
             if (!pushResult)
             {
-                EmrJobRunner.PrintError("Request failed...");
+                EmrJobLogger.PrintError(Resources.Info_EmrServiceNotOkResponse);
                 return false;
             }
 
             return true;
         }
 
-        private void StopRunning()
+        public void Dispose()
         {
-            this.threadTimer.Dispose();
-            this.threadTimer = null;
-        }
-
-        private static void PrintError(EmrActivityInfo activityInfo)
-        {
-            String errorMessage = activityInfo.JobFlowDetail.ExecutionStatusDetail.LastStateChangeReason;
-            EmrJobRunner.PrintError(String.Format(Resources.FailToRunJobTemplate, errorMessage));
-        }
-
-        private static void PrintError(string errorMessage)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(errorMessage);
-            Console.ResetColor();
-        }
-
-        private void PrintJobInfo(EmrActivityInfo activityInfo)
-        {
-            Console.WriteLine(String.Format(Resources.JobCurrentStateTemplate,
-                this.JobFlowId,
-                activityInfo.JobFlowDetail.Instances.MasterPublicDnsName ?? Resources.MasterPublicDnsNameNotDefined,
-                activityInfo.CurrentState,
-                EmrJobRunner.GetLatestRunningStepName(activityInfo.JobFlowDetail)));
-        }
-
-        private static String GetLatestRunningStepName(JobFlowDetail jobFlowDetail)
-        {
-            foreach (StepDetail stepDetail in jobFlowDetail.Steps)
+            // Attempt to move the disposable state from 0 to 1. If successful, we can be assured that
+            // this thread is the first thread to do so, and can safely dispose of the object.
+            if (Interlocked.CompareExchange(ref this.disposableState, 1, 0) == 0)
             {
-                if (stepDetail.ExecutionStatusDetail.State == StepExecutionState.RUNNING)
-                    return stepDetail.StepConfig.Name;
+                this.threadTimer.Dispose();
+                this.threadTimer = null;
             }
-
-            return Resources.RunningStepNotDefined;
         }
     }
 }

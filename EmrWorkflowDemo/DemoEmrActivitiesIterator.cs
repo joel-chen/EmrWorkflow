@@ -9,42 +9,33 @@ using System.Xml;
 
 namespace EmrWorkflowDemo
 {
-    public class DemoEmrActivitiesIterator : EmrActivitiesIterator
+    public class DemoEmrActivitiesIterator : EmrActivitiesEnumerator
     {
-        private IEnumerator<EmrActivityStrategy> currentFlow;
-        private IEnumerator<EmrActivityStrategy> successFlow;
-        private IEnumerator<EmrActivityStrategy> errorFlow;
+        private bool hasError = false;
 
-        public DemoEmrActivitiesIterator()
+        public IEnumerator<EmrActivityStrategy> GetActivities(EmrJobRunner emrRunner)
         {
-            this.successFlow = new List<EmrActivityStrategy>()
-            {
-                this.CreateStartActivity(),
-                this.CreateAddStepsActivity(),
-                this.CreateTerminateActivity("Job succeeded. terminate cluster")
-            }.GetEnumerator();
+            if (String.IsNullOrEmpty(emrRunner.JobFlowId))
+                yield return this.CreateStartActivity();
 
-            this.errorFlow = new List<EmrActivityStrategy>() 
-            {
-                this.CreateTerminateActivity("Terminate job because of error")
-            }.GetEnumerator();
-
-            this.currentFlow = this.successFlow;
+            yield return this.CreateAddStepsActivity();
+            yield return this.CreateAddStepsActivity();
+            yield return this.CreateAddStepsActivity();
+            yield return this.CreateTerminateActivity("Job succeeded. terminate cluster");
         }
 
-        public bool MoveNext
+        public void NotifyJobFailed(EmrJobRunner emrRunner)
         {
-            get { return this.currentFlow.MoveNext(); }
+            this.hasError = true;
         }
 
-        public EmrActivityStrategy Current
+        private IEnumerator<EmrActivityStrategy> GetFlow(EmrActivityStrategy goodFlowActiviy)
         {
-            get { return this.currentFlow.Current; }
-        }
+            if (!hasError)
+                yield return goodFlowActiviy;
 
-        public void NotifyJobFailed()
-        {
-            this.currentFlow = this.errorFlow;
+            yield return this.CreateTerminateActivity("Job failed. terminate cluster");
+            yield break;
         }
 
         private EmrActivityStrategy CreateStartActivity()

@@ -1,22 +1,17 @@
 ﻿using EmrWorkflow.Run.Strategies;
+using System.Collections.Generic;
 
 namespace EmrWorkflow.Run
 {
     /// <summary>
     /// Iterator through the job flow's activities
     /// </summary>
-    public interface EmrActivitiesIterator
+    public interface EmrActivitiesEnumerator
     {
         /// <summary>
-        /// Move to the next activity.
-        /// If there are no more activities, returns false.
+        /// Gets an enumerator
         /// </summary>
-        bool MoveNext { get; }
-
-        /// <summary>
-        /// Get current activity
-        /// </summary>
-        EmrActivityStrategy Current { get; }
+        IEnumerator<EmrActivityStrategy> GetActivities(EmrJobRunner emrRunner);
 
         /// <summary>
         /// Notify an iterator that the job failed, so it can switch to
@@ -24,6 +19,7 @@ namespace EmrWorkflow.Run
         /// or terminate the job flow
         /// or ignore it =)
         /// </summary>
-        void NotifyJobFailed();
+        /// <param name="emrRunner">Reference to the emrRunner</param>
+        void NotifyJobFailed(EmrJobRunner emrRunner);
     }
 }

@@ -58,6 +58,7 @@
   <ItemGroup>
     <Content Include="Workflow\JobConfig.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Workflow\Steps.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -15,18 +15,17 @@ namespace EmrWorkflowDemo
             AmazonElasticMapReduceClient emrClient = Program.CreateEmrClient();
             DemoEmrActivitiesIterator activitiesIterator = new DemoEmrActivitiesIterator();
 
-            EmrJobRunner emrRunner = new EmrJobRunner(settings, emrClient, activitiesIterator);
-
-            //======== If you want to add steps to an existing job ========
-            //runner.JobFlowId = "j-111AAABBBNJ2I"; //explicitly set an existing jobFlowId
-            //runner.EmrActivities.RemoveAt(0); //remove start and configure job step
-            //=============================================================
-
-            emrRunner.Run();
-
-            while (emrRunner.IsRunning)
+            using (EmrJobRunner emrRunner = new EmrJobRunner(settings, emrClient, activitiesIterator))
             {
-                Thread.Sleep(5000);
+                //explicitly set an existing jobFlowId, if you want to work with an existing job
+                //emrRunner.JobFlowId = "j-36G3NHTVEP1Q7";
+
+                emrRunner.Run();
+
+                while (emrRunner.IsRunning)
+                {
+                    Thread.Sleep(5000);
+                }
             }
         }
 
@@ -36,7 +35,9 @@ namespace EmrWorkflowDemo
         /// <returns>Settings</returns>
         public static BuilderSettings CreateSettings()
         {
-            return new BuilderSettings();
+            BuilderSettings settings = new BuilderSettings();
+            settings.Put("s3Bucket", "s3://myBucket/emr");
+            return settings;
         }
 
         public static AmazonElasticMapReduceClient CreateEmrClient()
