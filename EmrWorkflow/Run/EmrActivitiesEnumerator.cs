@@ -55,6 +55,9 @@ namespace EmrWorkflow.Run
         /// </summary>
         /// <param name="emrRunner">Reference to the emrRunner</param>
         /// <returns>Sequence of bad activities</returns>
-        protected abstract IEnumerable<EmrActivityStrategy> GetFailedFlow(EmrJobRunner emrRunner);
+        protected virtual IEnumerable<EmrActivityStrategy> GetFailedFlow(EmrJobRunner emrRunner)
+        {
+            yield break;
+        }
     }
 }
