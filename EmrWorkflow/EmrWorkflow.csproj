@@ -72,6 +72,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Run\EmrActivitiesEnumerator.cs" />
+    <Compile Include="Run\EmrWorkerBase.cs" />
     <Compile Include="Run\EmrJobLogger.cs" />
     <Compile Include="Run\EmrJobRunner.cs" />
     <Compile Include="Run\EmrJobStateChecker.cs" />
