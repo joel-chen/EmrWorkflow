@@ -4,18 +4,19 @@ using EmrWorkflow.Run.Model;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace EmrWorkflow.Run
 {
     //TODO: cover with test
     public class EmrJobStateChecker
     {
-        public EmrActivityInfo Check(AmazonElasticMapReduceClient emrClient, String jobFlowId)
+        public async Task<EmrActivityInfo> CheckAsync(IAmazonElasticMapReduce emrClient, String jobFlowId)
         {
             //Read job state
             DescribeJobFlowsRequest request = new DescribeJobFlowsRequest();
             request.JobFlowIds = new List<string>() { jobFlowId };
-            DescribeJobFlowsResponse response = emrClient.DescribeJobFlows(request);
+            DescribeJobFlowsResponse response = await emrClient.DescribeJobFlowsAsync(request);
             if (response.HttpStatusCode != HttpStatusCode.OK)
                 return new EmrActivityInfo() { CurrentState = EmrActivityState.Failed };
 

@@ -26,7 +26,7 @@ namespace EmrWorkflow.Run
         /// <param name="settings">Settings to replace placeholders</param>
         /// <param name="emrClient">Instantiated EMR Client to make requests to the Amazon EMR Service</param>
         /// <param name="emrActivitiesEnumerator">Iterator through the job flow's activities</param>
-        public EmrJobRunner(BuilderSettings settings, AmazonElasticMapReduceClient emrClient, EmrActivitiesEnumerator emrActivitiesEnumerator)
+        public EmrJobRunner(BuilderSettings settings, IAmazonElasticMapReduce emrClient, EmrActivitiesEnumerator emrActivitiesEnumerator)
             : base()
         {
             this.hasErrors = false;
@@ -57,7 +57,7 @@ namespace EmrWorkflow.Run
         /// <summary>
         /// Instantiated EMR Client to make requests to the Amazon EMR Service
         /// </summary>
-        public AmazonElasticMapReduceClient EmrClient { get; set; }
+        public IAmazonElasticMapReduce EmrClient { get; set; }
 
         /// <summary>
         /// Iterator through the job flow's activities
@@ -81,7 +81,7 @@ namespace EmrWorkflow.Run
         {
             EmrJobLogger.PrintCheckingStatus();
             EmrJobStateChecker jobStateChecker = new EmrJobStateChecker();
-            EmrActivityInfo activityInfo = jobStateChecker.Check(this.EmrClient, this.JobFlowId);
+            EmrActivityInfo activityInfo = await jobStateChecker.CheckAsync(this.EmrClient, this.JobFlowId);
 
             if (activityInfo.CurrentState == EmrActivityState.Running)
             {

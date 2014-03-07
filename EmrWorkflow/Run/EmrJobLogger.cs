@@ -6,8 +6,15 @@ using System;
 
 namespace EmrWorkflow.Run
 {
-    static class EmrJobLogger
+    public static class EmrJobLogger
     {
+        public static void PrintInfo(string infoMessage)
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(infoMessage);
+            Console.ResetColor();
+        }
+
         public static void PrintCompleted(bool hasErrors)
         {
             Console.WriteLine();
