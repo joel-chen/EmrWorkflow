@@ -72,10 +72,13 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Run\EmrActivitiesEnumerator.cs" />
+    <Compile Include="Run\EmrJobManagerBase.cs" />
     <Compile Include="Run\EmrWorkerBase.cs" />
-    <Compile Include="Run\EmrJobLogger.cs" />
-    <Compile Include="Run\EmrJobRunner.cs" />
-    <Compile Include="Run\EmrJobStateChecker.cs" />
+    <Compile Include="Run\Implementation\EmrJobLogger.cs" />
+    <Compile Include="Run\Implementation\EmrJobRunner.cs" />
+    <Compile Include="Run\Implementation\EmrJobStateChecker.cs" />
+    <Compile Include="Run\IEmrJobLogger.cs" />
+    <Compile Include="Run\IEmrJobStateChecker.cs" />
     <Compile Include="Run\Model\EmrActivityInfo.cs" />
     <Compile Include="Run\Model\EmrActivityState.cs" />
     <Compile Include="Run\Strategies\AddStepsStrategy.cs" />

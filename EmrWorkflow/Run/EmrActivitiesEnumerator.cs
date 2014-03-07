@@ -1,4 +1,5 @@
-﻿using EmrWorkflow.Run.Strategies;
+﻿using EmrWorkflow.Run.Implementation;
+using EmrWorkflow.Run.Strategies;
 using System.Collections.Generic;
 
 namespace EmrWorkflow.Run

@@ -2,6 +2,7 @@
 using EmrWorkflow.Model.Serialization;
 using EmrWorkflow.Model.Steps;
 using EmrWorkflow.Run;
+using EmrWorkflow.Run.Implementation;
 using EmrWorkflow.Run.Strategies;
 using System;
 using System.Collections.Generic;

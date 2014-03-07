@@ -6,11 +6,20 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace EmrWorkflow.Run
+namespace EmrWorkflow.Run.Implementation
 {
     //TODO: cover with test
-    public class EmrJobStateChecker
+    /// <summary>
+    /// A class to check the current state of the EMR Job
+    /// </summary>
+    public class EmrJobStateChecker : IEmrJobStateChecker
     {
+        /// <summary>
+        /// Send a request to the EMR service to get the latest state of the job
+        /// </summary>
+        /// <param name="emrClient">Instantiated EMR Client to make requests to the Amazon EMR Service</param>
+        /// <param name="jobFlowId">EMR Job flow id</param>
+        /// <returns>Current state of the EMR Job</returns>
         public async Task<EmrActivityInfo> CheckAsync(IAmazonElasticMapReduce emrClient, String jobFlowId)
         {
             //Read job state

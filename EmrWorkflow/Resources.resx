@@ -235,7 +235,7 @@ Master URL:	{2}</value>
     <value>Adding activity: {0}</value>
   </data>
   <data name="Info_CheckingJobStatus" xml:space="preserve">
-    <value>--------------------------</value>
+    <value>----------- Checking EMR job status -----------</value>
   </data>
   <data name="Info_CompletedSuccessfully" xml:space="preserve">
     <value>Completed successfully...</value>

@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace EmrPlusSwf
 {
-    class Constants
+    public class SwfActivityState
     {
-        public const string EmrJobDomain = "CG1";
-        public const string EmrJobTasksList = "EmrJobTasksList";
+        public string ActivityFileName { get; set; }
+
+        public EmrActivityEnum EmrActivityType { get; set; }
     }
 }

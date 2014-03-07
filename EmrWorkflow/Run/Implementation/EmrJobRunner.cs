@@ -6,9 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace EmrWorkflow.Run
+namespace EmrWorkflow.Run.Implementation
 {
-    public class EmrJobRunner : EmrWorkerBase
+    public class EmrJobRunner : EmrJobManagerBase
     {
         /// <summary>
         /// Internal field to indicate if job had errors
@@ -21,43 +21,19 @@ namespace EmrWorkflow.Run
         private IEnumerator<EmrActivityStrategy> activities;
 
         /// <summary>
-        /// Constructor
+        /// Constructor for injecting dependencies
         /// </summary>
-        /// <param name="settings">Settings to replace placeholders</param>
+        /// <param name="emrJobLogger">Instantiated object to log information about the EMR Job</param>
         /// <param name="emrClient">Instantiated EMR Client to make requests to the Amazon EMR Service</param>
+        /// <param name="emrJobStateChecker">Instantiated object to check the current state of the EMR Job</param>
+        /// <param name="settings">Settings to replace placeholders</param>
         /// <param name="emrActivitiesEnumerator">Iterator through the job flow's activities</param>
-        public EmrJobRunner(BuilderSettings settings, IAmazonElasticMapReduce emrClient, EmrActivitiesEnumerator emrActivitiesEnumerator)
-            : base()
+        public EmrJobRunner(IEmrJobLogger emrJobLogger, IAmazonElasticMapReduce emrClient, IEmrJobStateChecker emrJobStateChecker, BuilderSettings settings, EmrActivitiesEnumerator emrActivitiesEnumerator)
+            : base(emrJobLogger, emrClient, emrJobStateChecker, settings)
         {
             this.hasErrors = false;
-            this.Settings = settings;
-            this.EmrClient = emrClient;
             this.EmrActivitiesEnumerator = emrActivitiesEnumerator;
         }
-
-        /// <summary>
-        /// Current job flow's id.
-        /// Is set automatically after submitting a new job to EMR.
-        /// If the job already exists, should be set manually.
-        /// </summary>
-        public string JobFlowId
-        {
-            get { return this.Settings.Get(BuilderSettings.JobFlowId); }
-            set
-            {
-                this.Settings.Put(BuilderSettings.JobFlowId, value);
-            }
-        }
-
-        /// <summary>
-        /// Settings to replace placeholders
-        /// </summary>
-        public BuilderSettings Settings { get; set; }
-
-        /// <summary>
-        /// Instantiated EMR Client to make requests to the Amazon EMR Service
-        /// </summary>
-        public IAmazonElasticMapReduce EmrClient { get; set; }
 
         /// <summary>
         /// Iterator through the job flow's activities
@@ -67,7 +43,7 @@ namespace EmrWorkflow.Run
         /// <summary>
         /// Start the job flow
         /// </summary>
-        public async void Run()
+        public override async void Start()
         {
             this.activities = this.EmrActivitiesEnumerator.GetActivities(this).GetEnumerator();
 
@@ -78,21 +54,19 @@ namespace EmrWorkflow.Run
         }
 
         protected async override void DoWorkSafe()
-        {
-            EmrJobLogger.PrintCheckingStatus();
-            EmrJobStateChecker jobStateChecker = new EmrJobStateChecker();
-            EmrActivityInfo activityInfo = await jobStateChecker.CheckAsync(this.EmrClient, this.JobFlowId);
+        {            
+            EmrActivityInfo activityInfo = await this.CheckJobStateAsync();
 
             if (activityInfo.CurrentState == EmrActivityState.Running)
             {
-                EmrJobLogger.PrintJobInfo(activityInfo);
+                this.EmrJobLogger.PrintJobInfo(activityInfo);
             }
             else
             {
                 if (activityInfo.CurrentState == EmrActivityState.Failed)
                 {
                     this.hasErrors = true;
-                    EmrJobLogger.PrintError(activityInfo);
+                    this.EmrJobLogger.PrintError(activityInfo);
                     this.EmrActivitiesEnumerator.NotifyJobFailed(this);
                 }
 
@@ -105,12 +79,12 @@ namespace EmrWorkflow.Run
         {
             if (!this.activities.MoveNext())
             {
-                EmrJobLogger.PrintCompleted(this.hasErrors);
+                this.EmrJobLogger.PrintCompleted(this.hasErrors);
                 return false;
             }
 
             EmrActivityStrategy activity = this.activities.Current;
-            EmrJobLogger.PrintAddingNewActivity(activity);
+            this.EmrJobLogger.PrintAddingNewActivity(activity);
 
             //TODO: probably add a retry cycle
             bool pushResult;
@@ -120,13 +94,13 @@ namespace EmrWorkflow.Run
             }
             catch (Exception ex)
             {
-                EmrJobLogger.PrintError(String.Format(Resources.Info_ExceptionWhenSendingRequestTemplate, ex.Message));
+                this.EmrJobLogger.PrintError(String.Format(Resources.Info_ExceptionWhenSendingRequestTemplate, ex.Message));
                 return false;
             }
 
             if (!pushResult)
             {
-                EmrJobLogger.PrintError(Resources.Info_EmrServiceNotOkResponse);
+                this.EmrJobLogger.PrintError(Resources.Info_EmrServiceNotOkResponse);
                 return false;
             }
 

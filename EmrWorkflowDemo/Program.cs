@@ -2,6 +2,7 @@
 using Amazon.ElasticMapReduce;
 using EmrWorkflow.RequestBuilders;
 using EmrWorkflow.Run;
+using EmrWorkflow.Run.Implementation;
 using System;
 using System.Threading;
 
@@ -11,16 +12,19 @@ namespace EmrWorkflowDemo
     {
         public static void Main(string[] args)
         {
+            //Create dependencies
             BuilderSettings settings = Program.CreateSettings();
             AmazonElasticMapReduceClient emrClient = Program.CreateEmrClient();
+            IEmrJobLogger emrJobLogger = new EmrJobLogger();
+            IEmrJobStateChecker emrJobStateChecker = new EmrJobStateChecker();
             DemoEmrActivitiesEnumerator activitiesIterator = new DemoEmrActivitiesEnumerator();
 
-            using (EmrJobRunner emrRunner = new EmrJobRunner(settings, emrClient, activitiesIterator))
+            using (EmrJobRunner emrRunner = new EmrJobRunner(emrJobLogger, emrClient, emrJobStateChecker, settings, activitiesIterator))
             {
                 //explicitly set an existing jobFlowId, if you want to work with an existing job
                 //emrRunner.JobFlowId = "j-36G3NHTVEP1Q7";
 
-                emrRunner.Run();
+                emrRunner.Start();
 
                 while (emrRunner.IsRunning)
                 {

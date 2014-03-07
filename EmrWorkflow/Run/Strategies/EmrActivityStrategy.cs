@@ -13,7 +13,7 @@ namespace EmrWorkflow.Run.Strategies
 
         public string Name { get; set; }
 
-        public abstract Task<bool> PushAsync(EmrJobRunner emrJobRunner);
+        public abstract Task<bool> PushAsync(EmrJobManagerBase emrJobManager);
 
         protected bool IsOk(AmazonWebServiceResponse response)
         {

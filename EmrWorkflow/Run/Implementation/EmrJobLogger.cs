@@ -4,18 +4,29 @@ using EmrWorkflow.Run.Model;
 using EmrWorkflow.Run.Strategies;
 using System;
 
-namespace EmrWorkflow.Run
+namespace EmrWorkflow.Run.Implementation
 {
-    public static class EmrJobLogger
+    /// <summary>
+    /// A class to log information about the EMR Job
+    /// </summary>
+    public class EmrJobLogger : IEmrJobLogger
     {
-        public static void PrintInfo(string infoMessage)
+        /// <summary>
+        /// Print a specified message
+        /// </summary>
+        /// <param name="infoMessage">Message</param>
+        public void PrintInfo(string infoMessage)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine(infoMessage);
             Console.ResetColor();
         }
 
-        public static void PrintCompleted(bool hasErrors)
+        /// <summary>
+        /// Print that a job completed
+        /// </summary>
+        /// <param name="hasErrors">A flag that indicates that a job completed with errors</param>
+        public void PrintCompleted(bool hasErrors)
         {
             Console.WriteLine();
             if (hasErrors)
@@ -31,34 +42,53 @@ namespace EmrWorkflow.Run
             Console.ResetColor();
         }
 
-        public static void PrintCheckingStatus()
+        /// <summary>
+        /// Print that a process is checking the status of the EMR Job
+        /// </summary>
+        public void PrintCheckingStatus()
         {
             Console.ForegroundColor = ConsoleColor.Gray;
             Console.WriteLine(Resources.Info_CheckingJobStatus);
             Console.ResetColor();
         }
 
-        public static void PrintAddingNewActivity(EmrActivityStrategy activity)
+        /// <summary>
+        /// Print that a process is adding new activity to the EMR Job
+        /// </summary>
+        /// <param name="activity">A new activity to be added to the EMR Job</param>
+        public void PrintAddingNewActivity(EmrActivityStrategy activity)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(String.Format(Resources.Info_AddingActivityTemplate, activity.Name));
             Console.ResetColor();
         }
 
-        public static void PrintError(EmrActivityInfo activityInfo)
+        /// <summary>
+        /// Print that EMR Job has an error
+        /// </summary>
+        /// <param name="activityInfo">Current state of the job and current activity</param>
+        public void PrintError(EmrActivityInfo activityInfo)
         {
             String errorMessage = activityInfo.JobFlowDetail.ExecutionStatusDetail.LastStateChangeReason;
-            EmrJobLogger.PrintError(String.Format(Resources.Info_FailToRunJobTemplate, errorMessage));
+            this.PrintError(String.Format(Resources.Info_FailToRunJobTemplate, errorMessage));
         }
 
-        public static void PrintError(string errorMessage)
+        /// <summary>
+        /// Print error message
+        /// </summary>
+        /// <param name="errorMessage">Error message</param>
+        public void PrintError(string errorMessage)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(errorMessage);
             Console.ResetColor();
         }
 
-        public static void PrintJobInfo(EmrActivityInfo activityInfo)
+        /// <summary>
+        /// Print current EMR Job's state
+        /// </summary>
+        /// <param name="activityInfo">Current state of the job and current activity</param>
+        public void PrintJobInfo(EmrActivityInfo activityInfo)
         {
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write(Resources.Info_JobFlowId);

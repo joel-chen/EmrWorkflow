@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace EmrWorkflow.Run.Strategies
 {
+    /// <summary>
+    /// A strategy to start a new cluster to run an EMR Job
+    /// </summary>
     public class StartJobStrategy : EmrActivityStrategy
     {
         private JobFlow jobFlow;
@@ -15,16 +18,16 @@ namespace EmrWorkflow.Run.Strategies
             this.jobFlow = jobFlow;
         }
 
-        public override async Task<bool> PushAsync(EmrJobRunner emrJobRunner)
+        public override async Task<bool> PushAsync(EmrJobManagerBase emrJobManager)
         {
-            RunJobFlowRequestBuilder builder = new RunJobFlowRequestBuilder(emrJobRunner.Settings);
+            RunJobFlowRequestBuilder builder = new RunJobFlowRequestBuilder(emrJobManager.Settings);
             RunJobFlowRequest request = builder.Build(this.jobFlow);
 
-            RunJobFlowResponse response = await emrJobRunner.EmrClient.RunJobFlowAsync(request);
+            RunJobFlowResponse response = await emrJobManager.EmrClient.RunJobFlowAsync(request);
             if (!this.IsOk(response))
                 return false;
 
-            emrJobRunner.JobFlowId = response.JobFlowId;
+            emrJobManager.JobFlowId = response.JobFlowId;
             return true;
         }
     }

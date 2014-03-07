@@ -23,13 +23,34 @@ namespace EmrWorkflow.Run
         /// </summary>
         private Timer threadTimer;
 
-        public EmrWorkerBase()
+        /// <summary>
+        /// Constructor for injecting dependencies
+        /// </summary>
+        /// <param name="emrJobLogger">Instantiated object to log information about the EMR Job</param>
+        public EmrWorkerBase(IEmrJobLogger emrJobLogger)
         {
             this.isBusy = 0;
+            this.EmrJobLogger = emrJobLogger;
             this.threadTimer = new Timer(this.DoWork);
         }
 
-        protected void Start()
+        /// <summary>
+        /// If the job is running
+        /// </summary>
+        public bool IsRunning
+        {
+            get { return Thread.VolatileRead(ref this.disposableState) == 0; }
+        }
+
+        /// <summary>
+        /// Object to log information about the EMR Job
+        /// </summary>
+        public IEmrJobLogger EmrJobLogger { get; set; }
+
+        /// <summary>
+        /// Start the worker
+        /// </summary>
+        public virtual void Start()
         {
             this.threadTimer.Change(0, timerPeriod);
         }
@@ -50,14 +71,6 @@ namespace EmrWorkflow.Run
         }
 
         protected abstract void DoWorkSafe();
-
-        /// <summary>
-        /// If the job is running
-        /// </summary>
-        public bool IsRunning
-        {
-            get { return Thread.VolatileRead(ref this.disposableState) == 0; }
-        }
 
         public void Dispose()
         {
