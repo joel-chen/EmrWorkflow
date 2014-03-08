@@ -252,4 +252,10 @@ Master URL:	{2}</value>
   <data name="Info_JobFlowId" xml:space="preserve">
     <value>Job id:		</value>
   </data>
+  <data name="E_HBaseBackupJarIsMissing" xml:space="preserve">
+    <value>HBaseJarPath property is missing for the HBase Backup Step. Example: "/home/hadoop/lib/hbase-0.94.7.jar"</value>
+  </data>
+  <data name="E_HBaseRestoreJarIsMissing" xml:space="preserve">
+    <value>HBaseJarPath property is missing for the HBase Restore Step. Example: "/home/hadoop/lib/hbase-0.94.7.jar"</value>
+  </data>
 </root>

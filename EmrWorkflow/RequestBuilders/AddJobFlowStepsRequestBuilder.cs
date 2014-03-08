@@ -9,7 +9,7 @@ namespace EmrWorkflow.RequestBuilders
         private AddJobFlowStepsRequest result;
         private BuildRequestVisitor visitor;
 
-        public AddJobFlowStepsRequestBuilder(BuilderSettings settings)
+        public AddJobFlowStepsRequestBuilder(IBuilderSettings settings)
         {
            this.visitor = new BuildRequestVisitor(settings);
 

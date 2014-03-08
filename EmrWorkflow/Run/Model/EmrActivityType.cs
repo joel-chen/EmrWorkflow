@@ -1,7 +1,6 @@
-﻿
-namespace EmrPlusSwf
+﻿namespace EmrWorkflow.Run.Model
 {
-    public enum EmrActivityEnum
+    public enum EmrActivityType
     {
         /// <summary>
         /// Activity "Start a new cluster to run an EMR Job"

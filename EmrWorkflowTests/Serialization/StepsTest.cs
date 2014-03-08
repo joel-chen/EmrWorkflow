@@ -49,7 +49,7 @@ namespace EmrWorkflowTests
         private IList<StepBase> GetTestStepsList()
         {
             IList<StepBase> steps = new List<StepBase>();
-            steps.Add(new HBaseRestoreStep() { RestorePath = "s3://myBucket/hBaseRestore" });
+            steps.Add(new HBaseRestoreStep() { HBaseJarPath = "{hbaseJar}", RestorePath = "s3://myBucket/hBaseRestore" });
             steps.Add(new JarStep()
             {
                 Name = "step 1",
@@ -58,7 +58,7 @@ namespace EmrWorkflowTests
                 MainClass = "com.supperslonic.emr.Step1Driver",
                 Args = new List<String>() { "true", "12.34", "hello" }
             });
-            steps.Add(new HBaseBackupStep { BackupPath = "s3://myBucket/hBaseBackup" });
+            steps.Add(new HBaseBackupStep { HBaseJarPath = "{hbaseJar}", BackupPath = "s3://myBucket/hBaseBackup" });
             steps.Add(new JarStep()
             {
                 Name = "step 2",

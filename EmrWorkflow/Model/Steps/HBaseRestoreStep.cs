@@ -1,5 +1,4 @@
-﻿using EmrWorkflow.RequestBuilders;
-using System;
+﻿using System;
 using System.Xml;
 
 namespace EmrWorkflow.Model.Steps
@@ -11,6 +10,14 @@ namespace EmrWorkflow.Model.Steps
         /// </summary>
         internal const String RootXmlElement = "restoreHBase";
 
+        /// <summary>
+        /// A path to an HBase jar file
+        /// </summary>
+        public String HBaseJarPath { get; set; }
+
+        /// <summary>
+        /// A path to restore HBase
+        /// </summary>
         public String RestorePath { get; set; }
 
         /// <summary>
@@ -32,12 +39,27 @@ namespace EmrWorkflow.Model.Steps
 
         /// <summary>
         /// Used for XML deserialization.
-        /// Populate object properties from the attributes
+        /// Populate object properties from the nested elements
         /// </summary>
-        /// <param name="reader">Xml reader</param>
-        protected override void ReadXmlAttributes(XmlReader reader)
+        /// <param name="elementName">Xml element name</param>
+        /// <param name="value">Value of the element</param>
+        /// <returns>True - if was processed, false - doesn't support the specified <see cref="elementName"/></returns>
+        protected override bool ReadXmlValue(string elementName, string value)
         {
-            this.RestorePath = reader.GetAttribute("path");
+            switch (elementName)
+            {
+                case "jar":
+                    this.HBaseJarPath = value;
+                    break;
+                case "path":
+                    this.RestorePath = value;
+                    break;
+
+                default:
+                    return false;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -47,7 +69,8 @@ namespace EmrWorkflow.Model.Steps
         /// <param name="writer">Xml writer</param>       
         public override void WriteXml(XmlWriter writer)
         {
-            writer.WriteAttributeString("path", this.RestorePath);            
+            writer.WriteElementString("jar", this.HBaseJarPath);
+            writer.WriteElementString("path", this.RestorePath);  
         }
 
         #endregion
@@ -80,7 +103,8 @@ namespace EmrWorkflow.Model.Steps
                 return false;
             }
 
-            return obj1.RestorePath == obj2.RestorePath;
+            return obj1.HBaseJarPath == obj2.HBaseJarPath
+                && obj1.RestorePath == obj2.RestorePath;
         }
 
         public static bool operator ==(HBaseRestoreStep obj1, HBaseRestoreStep obj2)
@@ -95,7 +119,8 @@ namespace EmrWorkflow.Model.Steps
 
         public override int GetHashCode()
         {
-            return (this.RestorePath ?? String.Empty).GetHashCode();
+            return (this.HBaseJarPath ?? String.Empty).GetHashCode()
+                ^ (this.RestorePath ?? String.Empty).GetHashCode();
         }
 
         #endregion

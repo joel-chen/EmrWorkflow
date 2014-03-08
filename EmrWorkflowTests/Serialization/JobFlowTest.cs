@@ -73,8 +73,8 @@ namespace EmrWorkflowTests
             configs.Add(new HBaseConfig()
             {
                 IfStart = true,
-                JarPath = "/home/hadoop/lib/hbase-0.94.7.jar",
-                Args = new List<String>() { "--site-config-file", "s3://myBucket/hBase/config.xml" },
+                JarPath = "{hbaseJar}",
+                Args = new List<String>() { "--site-config-file", "{myBucket}/hBase/config.xml" },
                 HBaseDaemondsConfigArgs = new HBaseDaemonsConfig() { Args = new List<String>() { "--hbase-master-opts=-Xmx6140M -XX:NewSize=64m", "--regionserver-opts=-XX:MaxNewSize=64m -XX:+HeapDumpOnOutOfMemoryError" } }
             });
             jobFlow.Configs = configs;
@@ -84,7 +84,7 @@ namespace EmrWorkflowTests
             bootstrapActions.Add(new BootstrapAction()
             {
                 Name = "bootstrap action 1",
-                Path = "s3://myBucket/bootstrap/UploadLibraries.sh"
+                Path = "{myBucket}/bootstrap/UploadLibraries.sh"
             });
             bootstrapActions.Add(new BootstrapAction()
             {
@@ -96,20 +96,20 @@ namespace EmrWorkflowTests
 
             //================== Steps ==================
             IList<StepBase> steps = new List<StepBase>();
-            steps.Add(new HBaseRestoreStep() { RestorePath = "s3://myBucket/hBaseRestore" });
+            steps.Add(new HBaseRestoreStep() { HBaseJarPath = "{hbaseJar}", RestorePath = "{myBucket}/hBaseRestore" });
             steps.Add(new JarStep()
             {
                 Name = "step 1",
-                JarPath = "s3://myBucket/jars/test.jar",
+                JarPath = "{myBucket}/jars/test.jar",
                 ActionOnFailure = ActionOnFailure.CANCEL_AND_WAIT,
                 MainClass = "com.supperslonic.emr.Step1Driver",
                 Args = new List<String>() { "true", "12.34", "hello" }
             });
-            steps.Add(new HBaseBackupStep { BackupPath = "s3://myBucket/hBaseBackup" });
+            steps.Add(new HBaseBackupStep { HBaseJarPath = "{hbaseJar}", BackupPath = "{myBucket}/hBaseBackup" });
             steps.Add(new JarStep()
             {
                 Name = "step 2",
-                JarPath = "s3://myBucket/jars/test2.jar"
+                JarPath = "{myBucket}/jars/test2.jar"
             });
 
             jobFlow.Steps = steps;

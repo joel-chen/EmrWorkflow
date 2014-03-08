@@ -28,7 +28,10 @@
   </xs:complexType>
 
   <xs:complexType name="hBasePathType">
-    <xs:attribute name="path" type="xs:string" use="required" />
+    <xs:sequence>
+      <xs:element name="jar" type="xs:string" minOccurs="1" maxOccurs="1" />
+      <xs:element name="path" type="xs:string" minOccurs="1" maxOccurs="1" />
+    </xs:sequence>
   </xs:complexType>
 	
 </xs:schema>

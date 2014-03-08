@@ -155,6 +155,7 @@ namespace EmrWorkflowTests
             BuilderSettings settings = new BuilderSettings();
             settings.Put("myBucket", "s3://myBucket");
             settings.Put("mapreduce_map_memory_mb", "8192");
+            settings.Put("hbaseJar", "/home/hadoop/lib/hbase-0.94.7.jar");
             return settings;
         }
     }

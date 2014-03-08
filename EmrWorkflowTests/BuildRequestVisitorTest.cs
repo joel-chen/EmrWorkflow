@@ -480,8 +480,7 @@ namespace EmrWorkflowTests
             List<string> expectedStartArgs = new List<string>() { "--start-master" };
 
             //Init settings
-            BuilderSettings settings = BuildRequestVisitorTest.GetSettings();
-            Assert.IsNull(settings.Get(BuilderSettings.HBaseJarPath), "HBaseJarPath setting should not be set before the test in order to verify that it is populated by the visitor");
+            IBuilderSettings settings = BuildRequestVisitorTest.GetSettings();
 
             //Init visitor
             BuildRequestVisitor visitor = new BuildRequestVisitor(settings);
@@ -491,7 +490,6 @@ namespace EmrWorkflowTests
             hBaseConfig.Accept(visitor);
 
             //Verify
-            Assert.AreEqual("/home/hadoop/lib/hbase-0.94.7.jar", settings.Get(BuilderSettings.HBaseJarPath), "Unexpected HBaseJarPath in settings. Should have been populated by the visitor");
             Assert.AreEqual(2, visitorSubscriber.TotalObjCount, "Unexpected number of objects created");
 
             // BootstrapAction 1: Install HBase
@@ -522,7 +520,6 @@ namespace EmrWorkflowTests
 
             //Init settings
             BuilderSettings settings = BuildRequestVisitorTest.GetSettings();
-            Assert.IsNull(settings.Get(BuilderSettings.HBaseJarPath), "HBaseJarPath setting should not be set before the test in order to verify that it is populated by the visitor");
 
             //Init visitor
             BuildRequestVisitor visitor = new BuildRequestVisitor(settings);
@@ -532,7 +529,6 @@ namespace EmrWorkflowTests
             hBaseConfig.Accept(visitor);
 
             //Verify
-            Assert.AreEqual("/home/hadoop/lib/hbase-0.94.7.jar", settings.Get(BuilderSettings.HBaseJarPath), "Unexpected HBaseJarPath in settings. Should have been populated by the visitor");
             Assert.AreEqual(2, visitorSubscriber.TotalObjCount, "Unexpected number of objects created");
 
             // BootstrapAction 1: Install HBase
@@ -564,7 +560,6 @@ namespace EmrWorkflowTests
 
             //Init settings
             BuilderSettings settings = BuildRequestVisitorTest.GetSettings();
-            Assert.IsNull(settings.Get(BuilderSettings.HBaseJarPath), "HBaseJarPath setting should not be set before the test in order to verify that it is populated by the visitor");
 
             //Init visitor
             BuildRequestVisitor visitor = new BuildRequestVisitor(settings);
@@ -574,7 +569,6 @@ namespace EmrWorkflowTests
             hBaseConfig.Accept(visitor);
 
             //Verify
-            Assert.AreEqual("/home/hadoop/lib/hbase-0.94.7.jar", settings.Get(BuilderSettings.HBaseJarPath), "Unexpected HBaseJarPath in settings. Should have been populated by the visitor");
             Assert.AreEqual(3, visitorSubscriber.TotalObjCount, "Unexpected number of objects created");
 
             // BootstrapAction 1: Install HBase
@@ -893,7 +887,7 @@ namespace EmrWorkflowTests
         #region Visit HBaseRestoreStep
 
         [TestMethod]
-        public void HBaseJarPathIsMissingForRestore()
+        public void HBaseRestoreJarIsMissing()
         {
             //Input
             HBaseRestoreStep hBaseRestoreStep = new HBaseRestoreStep { RestorePath = "s3://myBucket/hBaseRestore" };
@@ -911,7 +905,7 @@ namespace EmrWorkflowTests
             catch (InvalidOperationException ex)
             {
                 Assert.IsFalse(visitorSubscriber.wasAnyEventFired, "None of the visitor's events should be fired!");
-                Assert.AreEqual<string>("JarPath property is missing for the HBase Configuration. Example: \"/home/hadoop/lib/hbase-0.94.7.jar\"", ex.Message, "Unexpected exception message");
+                Assert.AreEqual<string>("HBaseJarPath property is missing for the HBase Restore Step. Example: \"/home/hadoop/lib/hbase-0.94.7.jar\"", ex.Message, "Unexpected exception message");
             }
         }
 
@@ -919,11 +913,10 @@ namespace EmrWorkflowTests
         public void HBaseRestorePathIsMissing()
         {
             //Input
-            HBaseRestoreStep hBaseRestoreStep = new HBaseRestoreStep();
+            HBaseRestoreStep hBaseRestoreStep = new HBaseRestoreStep() { HBaseJarPath = "/home/hadoop/lib/hbase-0.94.7.jar" };
 
             //Init settings
             BuilderSettings settings = BuildRequestVisitorTest.GetSettings();
-            settings.Put(BuilderSettings.HBaseJarPath, "/home/hadoop/lib/hbase-0.94.7.jar");
 
             //Init visitor
             BuildRequestVisitor visitor = new BuildRequestVisitor(settings);
@@ -947,14 +940,14 @@ namespace EmrWorkflowTests
         {
             //Init args
             HBaseRestoreStep hBaseRestoreStep = new HBaseRestoreStep();
+            hBaseRestoreStep.HBaseJarPath = "{hbaseJar}";
             hBaseRestoreStep.RestorePath = "{myBucket}/hbase/restore";
 
             //Expectations
             List<string> expectedArgs = new List<string>() { "--restore", "--backup-dir", "s3://myBucket/hbase/restore" };
 
             //Init settings
-            BuilderSettings settings = BuildRequestVisitorTest.GetSettings();
-            settings.Put(BuilderSettings.HBaseJarPath, "/home/hadoop/lib/{hadoopVersion}/hbase-0.94.7.jar");
+            IBuilderSettings settings = BuildRequestVisitorTest.GetSettings();
 
             //Init visitor
             BuildRequestVisitor visitor = new BuildRequestVisitor(settings);
@@ -979,7 +972,7 @@ namespace EmrWorkflowTests
         #region Visit HBaseBackupStep
 
         [TestMethod]
-        public void HBaseJarPathIsMissingForBackup()
+        public void HBaseBackupJarIsMissing()
         {
             //Input
             HBaseBackupStep hBaseBackupStep = new HBaseBackupStep { BackupPath = "s3://myBucket/hBaseBackup" };
@@ -997,7 +990,7 @@ namespace EmrWorkflowTests
             catch (InvalidOperationException ex)
             {
                 Assert.IsFalse(visitorSubscriber.wasAnyEventFired, "None of the visitor's events should be fired!");
-                Assert.AreEqual<string>("JarPath property is missing for the HBase Configuration. Example: \"/home/hadoop/lib/hbase-0.94.7.jar\"", ex.Message, "Unexpected exception message");
+                Assert.AreEqual<string>("HBaseJarPath property is missing for the HBase Backup Step. Example: \"/home/hadoop/lib/hbase-0.94.7.jar\"", ex.Message, "Unexpected exception message");
             }
         }
 
@@ -1005,11 +998,10 @@ namespace EmrWorkflowTests
         public void HBaseBackupPathIsMissing()
         {
             //Input
-            HBaseBackupStep hBaseBackupStep = new HBaseBackupStep();
+            HBaseBackupStep hBaseBackupStep = new HBaseBackupStep() { HBaseJarPath = "/home/hadoop/lib/hbase-0.94.7.jar" };
 
             //Init settings
             BuilderSettings settings = BuildRequestVisitorTest.GetSettings();
-            settings.Put(BuilderSettings.HBaseJarPath, "/home/hadoop/lib/hbase-0.94.7.jar");
 
             //Init visitor
             BuildRequestVisitor visitor = new BuildRequestVisitor(settings);
@@ -1033,6 +1025,7 @@ namespace EmrWorkflowTests
         {
             //Init args
             HBaseBackupStep hBaseBackupStep = new HBaseBackupStep();
+            hBaseBackupStep.HBaseJarPath = "{hbaseJar}";
             hBaseBackupStep.BackupPath = "{myBucket}/hbase/backUp";
 
             //Expectations
@@ -1040,7 +1033,6 @@ namespace EmrWorkflowTests
 
             //Init settings
             BuilderSettings settings = BuildRequestVisitorTest.GetSettings();
-            settings.Put(BuilderSettings.HBaseJarPath, "/home/hadoop/lib/{hadoopVersion}/hbase-0.94.7.jar");
 
             //Init visitor
             BuildRequestVisitor visitor = new BuildRequestVisitor(settings);
@@ -1065,13 +1057,14 @@ namespace EmrWorkflowTests
         private static BuilderSettings GetSettings()
         {
             BuilderSettings settings = new BuilderSettings();
-            settings.Put(BuilderSettings.JobFlowId, "j-111AAABBBNJ2I");
+            settings.Put("jobFlowId", "j-111AAABBBNJ2I");
             settings.Put("myBucket", "s3://myBucket");
             settings.Put("myRole", "SupperSlonic");
             settings.Put("amiVersion", "3.0.3");
             settings.Put("contact", "supperslonic.com");
             settings.Put("ec2Key", "testEC2Key");
             settings.Put("hadoopVersion", "2.2.0");
+            settings.Put("hbaseJar", "/home/hadoop/lib/2.2.0/hbase-0.94.7.jar");
             settings.Put("masterInstanceType", "m1.medium");
             settings.Put("slaveInstanceType", "m3.2xlarge");
             settings.Put("arg1", "1234");

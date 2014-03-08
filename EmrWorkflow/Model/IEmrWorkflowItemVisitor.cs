@@ -1,10 +1,9 @@
-﻿using EmrWorkflow.Model;
-using EmrWorkflow.Model.BootstrapActions;
+﻿using EmrWorkflow.Model.BootstrapActions;
 using EmrWorkflow.Model.Configs;
 using EmrWorkflow.Model.Steps;
 using EmrWorkflow.Model.Tags;
 
-namespace EmrWorkflow.RequestBuilders
+namespace EmrWorkflow.Model
 {
     public interface IEmrWorkflowItemVisitor
     {

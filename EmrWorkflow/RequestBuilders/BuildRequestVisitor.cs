@@ -22,9 +22,9 @@ namespace EmrWorkflow.RequestBuilders
 
         public event EventHandler<StepConfig> OnStepConfigCreated;
 
-        private BuilderSettings settings;
+        private IBuilderSettings settings;
 
-        public BuildRequestVisitor(BuilderSettings settings)
+        public BuildRequestVisitor(IBuilderSettings settings)
         {
             this.settings = settings;
         }
@@ -108,8 +108,6 @@ namespace EmrWorkflow.RequestBuilders
             if (String.IsNullOrEmpty(hBaseConfig.JarPath))
                 throw new InvalidOperationException(Resources.E_HBaseJarPathIsMissing);
 
-            this.settings.Put(BuilderSettings.HBaseJarPath, hBaseConfig.JarPath);
-
             //install HBase
             this.CreateBootstrapActionConfig(
                 Resources.HBaseInstallName,
@@ -170,16 +168,15 @@ namespace EmrWorkflow.RequestBuilders
 
         public void Visit(HBaseRestoreStep hBaseRestoreStep)
         {
-            string hBaseJarPath = this.settings.Get(BuilderSettings.HBaseJarPath);
-            if (String.IsNullOrEmpty(hBaseJarPath))
-                throw new InvalidOperationException(Resources.E_HBaseJarPathIsMissing);
+            if (String.IsNullOrEmpty(hBaseRestoreStep.HBaseJarPath))
+                throw new InvalidOperationException(Resources.E_HBaseRestoreJarIsMissing);
 
             if (String.IsNullOrEmpty(hBaseRestoreStep.RestorePath))
                 throw new InvalidOperationException(Resources.E_HBaseRestorePathIsMissing);
 
             this.CreateStepConfig(
                 Resources.HBaseRestoreStepName,
-                hBaseJarPath,
+                hBaseRestoreStep.HBaseJarPath,
                 Resources.HBaseMainClass,
                 ActionOnFailure.TERMINATE_JOB_FLOW,
                 new List<String>() { "--restore", "--backup-dir", hBaseRestoreStep.RestorePath });
@@ -187,16 +184,15 @@ namespace EmrWorkflow.RequestBuilders
 
         public void Visit(HBaseBackupStep hBaseBackupStep)
         {
-            string hBaseJarPath = this.settings.Get(BuilderSettings.HBaseJarPath);
-            if (String.IsNullOrEmpty(hBaseJarPath))
-                throw new InvalidOperationException(Resources.E_HBaseJarPathIsMissing);
+            if (String.IsNullOrEmpty(hBaseBackupStep.HBaseJarPath))
+                throw new InvalidOperationException(Resources.E_HBaseBackupJarIsMissing);
 
             if (String.IsNullOrEmpty(hBaseBackupStep.BackupPath))
                 throw new InvalidOperationException(Resources.E_HBaseBackupPathIsMissing);
 
             this.CreateStepConfig(
                 Resources.HBaseBackupStepName,
-                hBaseJarPath,
+                hBaseBackupStep.HBaseJarPath,
                 Resources.HBaseMainClass,
                 ActionOnFailure.TERMINATE_JOB_FLOW,
                 new List<String>() { "--backup", "--backup-dir", hBaseBackupStep.BackupPath });

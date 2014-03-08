@@ -62,20 +62,20 @@
     <Compile Include="Model\Tags\ClusterTag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequestBuilders\AddJobFlowStepsRequestBuilder.cs" />
+    <Compile Include="RequestBuilders\IBuilderSettings.cs" />
     <Compile Include="RequestBuilders\BuilderSettings.cs" />
     <Compile Include="RequestBuilders\BuildRequestVisitor.cs" />
-    <Compile Include="RequestBuilders\IEmrWorkflowItemVisitor.cs" />
+    <Compile Include="Model\IEmrWorkflowItemVisitor.cs" />
     <Compile Include="RequestBuilders\RunJobFlowRequestBuilder.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Run\EmrActivitiesEnumerator.cs" />
-    <Compile Include="Run\EmrJobManagerBase.cs" />
-    <Compile Include="Run\EmrWorkerBase.cs" />
+    <Compile Include="Run\EmrActivitiesIteratorBase.cs" />
+    <Compile Include="Utils\TimerWorkerBase.cs" />
     <Compile Include="Run\Implementation\EmrJobLogger.cs" />
-    <Compile Include="Run\Implementation\EmrJobRunner.cs" />
+    <Compile Include="Run\EmrJobRunner.cs" />
     <Compile Include="Run\Implementation\EmrJobStateChecker.cs" />
     <Compile Include="Run\IEmrJobLogger.cs" />
     <Compile Include="Run\IEmrJobStateChecker.cs" />
@@ -85,6 +85,12 @@
     <Compile Include="Run\Strategies\EmrActivityStrategy.cs" />
     <Compile Include="Run\Strategies\StartJobStrategy.cs" />
     <Compile Include="Run\Strategies\TerminateJobStrategy.cs" />
+    <Compile Include="Run\Model\EmrActivityType.cs" />
+    <Compile Include="SWF\EmrActivitiesFactory.cs" />
+    <Compile Include="SWF\Model\Constants.cs" />
+    <Compile Include="SWF\Model\SwfEmrActivity.cs" />
+    <Compile Include="SWF\SwfEmrActivityProcessor.cs" />
+    <Compile Include="SWF\SwfEmrJobDecider.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">

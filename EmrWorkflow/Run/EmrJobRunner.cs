@@ -2,13 +2,14 @@
 using EmrWorkflow.RequestBuilders;
 using EmrWorkflow.Run.Model;
 using EmrWorkflow.Run.Strategies;
+using EmrWorkflow.Utils;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace EmrWorkflow.Run.Implementation
+namespace EmrWorkflow.Run
 {
-    public class EmrJobRunner : EmrJobManagerBase
+    public class EmrJobRunner : TimerWorkerBase
     {
         /// <summary>
         /// Internal field to indicate if job had errors
@@ -24,21 +25,51 @@ namespace EmrWorkflow.Run.Implementation
         /// Constructor for injecting dependencies
         /// </summary>
         /// <param name="emrJobLogger">Instantiated object to log information about the EMR Job</param>
-        /// <param name="emrClient">Instantiated EMR Client to make requests to the Amazon EMR Service</param>
         /// <param name="emrJobStateChecker">Instantiated object to check the current state of the EMR Job</param>
+        /// <param name="emrClient">Instantiated EMR Client to make requests to the Amazon EMR Service</param>
         /// <param name="settings">Settings to replace placeholders</param>
         /// <param name="emrActivitiesEnumerator">Iterator through the job flow's activities</param>
-        public EmrJobRunner(IEmrJobLogger emrJobLogger, IAmazonElasticMapReduce emrClient, IEmrJobStateChecker emrJobStateChecker, BuilderSettings settings, EmrActivitiesEnumerator emrActivitiesEnumerator)
-            : base(emrJobLogger, emrClient, emrJobStateChecker, settings)
+        public EmrJobRunner(IEmrJobLogger emrJobLogger, IEmrJobStateChecker emrJobStateChecker, IAmazonElasticMapReduce emrClient, IBuilderSettings settings, EmrActivitiesIteratorBase emrActivitiesEnumerator)
         {
             this.hasErrors = false;
+            this.Settings = settings;
+            this.EmrClient = emrClient;
+            this.EmrJobLogger = emrJobLogger;
+            this.EmrJobStateChecker = emrJobStateChecker;
             this.EmrActivitiesEnumerator = emrActivitiesEnumerator;
         }
 
         /// <summary>
+        /// Current job flow's id.
+        /// Is set automatically after submitting a new job to EMR.
+        /// If the job already exists, should be set manually.
+        /// </summary>
+        public string JobFlowId { get; set; }
+
+        /// <summary>
+        /// Settings to replace placeholders
+        /// </summary>
+        public IBuilderSettings Settings { get; set; }
+
+        /// <summary>
+        /// EMR Client to make requests to the Amazon EMR Service
+        /// </summary>
+        public IAmazonElasticMapReduce EmrClient { get; set; }
+
+        /// <summary>
+        /// Object to log information about the EMR Job
+        /// </summary>
+        public IEmrJobLogger EmrJobLogger { get; set; }
+
+        /// <summary>
+        /// Object to check the current state of the EMR Job
+        /// </summary>
+        public IEmrJobStateChecker EmrJobStateChecker { get; set; }
+
+        /// <summary>
         /// Iterator through the job flow's activities
         /// </summary>
-        public EmrActivitiesEnumerator EmrActivitiesEnumerator { get; set; }
+        public EmrActivitiesIteratorBase EmrActivitiesEnumerator { get; set; }
 
         /// <summary>
         /// Start the job flow
@@ -54,8 +85,9 @@ namespace EmrWorkflow.Run.Implementation
         }
 
         protected async override void DoWorkSafe()
-        {            
-            EmrActivityInfo activityInfo = await this.CheckJobStateAsync();
+        {
+            this.EmrJobLogger.PrintCheckingStatus();
+            EmrActivityInfo activityInfo = await this.EmrJobStateChecker.CheckAsync(this.EmrClient, this.JobFlowId);
 
             if (activityInfo.CurrentState == EmrActivityState.Running)
             {
@@ -87,10 +119,10 @@ namespace EmrWorkflow.Run.Implementation
             this.EmrJobLogger.PrintAddingNewActivity(activity);
 
             //TODO: probably add a retry cycle
-            bool pushResult;
+            string resultJobFlowId;
             try
             {
-                pushResult = await activity.PushAsync(this);
+                resultJobFlowId = await activity.PushAsync(this.EmrClient, this.Settings, this.JobFlowId);
             }
             catch (Exception ex)
             {
@@ -98,12 +130,13 @@ namespace EmrWorkflow.Run.Implementation
                 return false;
             }
 
-            if (!pushResult)
+            if (String.IsNullOrEmpty(resultJobFlowId))
             {
                 this.EmrJobLogger.PrintError(Resources.Info_EmrServiceNotOkResponse);
                 return false;
             }
 
+            this.JobFlowId = resultJobFlowId;
             return true;
         }
 

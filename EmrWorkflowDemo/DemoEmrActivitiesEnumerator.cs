@@ -1,7 +1,4 @@
-﻿using EmrWorkflow.Model;
-using EmrWorkflow.Model.Serialization;
-using EmrWorkflow.Model.Steps;
-using EmrWorkflow.Run;
+﻿using EmrWorkflow.Run;
 using EmrWorkflow.Run.Implementation;
 using EmrWorkflow.Run.Strategies;
 using System;
@@ -10,7 +7,7 @@ using System.Xml;
 
 namespace EmrWorkflowDemo
 {
-    public class DemoEmrActivitiesEnumerator : EmrActivitiesEnumerator
+    public class DemoEmrActivitiesEnumerator : EmrActivitiesIteratorBase
     {
         protected override IEnumerable<EmrActivityStrategy> GetNormalFlow(EmrJobRunner emrRunner)
         {
@@ -30,18 +27,14 @@ namespace EmrWorkflowDemo
         {
             XmlDocument jobFlowXml = new XmlDocument();
             jobFlowXml.Load("Workflow/JobConfig.xml");
-            JobFlow jobFlow = JobFlow.GetRecord(jobFlowXml.OuterXml);
-
-            return new StartJobStrategy("start and configure job", jobFlow);
+            return new StartJobStrategy("start and configure job", jobFlowXml);
         }
 
         private EmrActivityStrategy CreateAddStepsActivity()
         {
             XmlDocument stepsXml = new XmlDocument();
             stepsXml.Load("Workflow/Steps.xml");
-            IList<StepBase> steps = new StepsXmlFactory().ReadXml(stepsXml.OuterXml);
-
-            return new AddStepsStrategy("first activity", steps);
+            return new AddStepsStrategy("first activity", stepsXml);
         }
     }
 }

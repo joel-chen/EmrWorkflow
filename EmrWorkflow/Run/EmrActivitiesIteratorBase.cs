@@ -7,7 +7,7 @@ namespace EmrWorkflow.Run
     /// <summary>
     /// Iterator through the job flow's activities
     /// </summary>
-    public abstract class EmrActivitiesEnumerator
+    public abstract class EmrActivitiesIteratorBase
     {
         /// <summary>
         /// Flag indicates that an error has occurred

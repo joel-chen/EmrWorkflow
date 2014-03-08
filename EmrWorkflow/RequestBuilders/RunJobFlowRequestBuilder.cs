@@ -11,7 +11,7 @@ namespace EmrWorkflow.RequestBuilders
         private RunJobFlowRequest result;
         private BuildRequestVisitor visitor;
 
-        public RunJobFlowRequestBuilder(BuilderSettings settings)
+        public RunJobFlowRequestBuilder(IBuilderSettings settings)
         {
            this.visitor = new BuildRequestVisitor(settings);
 

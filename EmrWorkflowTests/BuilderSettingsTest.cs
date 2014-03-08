@@ -12,11 +12,11 @@ namespace EmrWorkflowTests
         {
             BuilderSettings settings = new BuilderSettings();
 
-            settings.Put(BuilderSettings.JobFlowId, "fake");
+            settings.Put("jobFlowId", "fake");
 
             try
             {
-                settings.Put(BuilderSettings.JobFlowId, "new fake");
+                settings.Put("jobFlowId", "new fake");
                 Assert.Fail("Exception has not been thrown!!!");
             }
             catch(ArgumentException ex)
@@ -68,7 +68,7 @@ namespace EmrWorkflowTests
 
             //Init settings
             BuilderSettings settings = new BuilderSettings();
-            settings.Put(BuilderSettings.JobFlowId, "j-111AAABBBNJ2I");
+            settings.Put("jobFlowId", "j-111AAABBBNJ2I");
             settings.Put("outputDir", "s3://myBucket/output");
 
             //Action

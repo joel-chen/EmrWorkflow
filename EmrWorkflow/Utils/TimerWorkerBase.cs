@@ -1,9 +1,10 @@
-﻿using System;
+﻿using EmrWorkflow.Run;
+using System;
 using System.Threading;
 
-namespace EmrWorkflow.Run
+namespace EmrWorkflow.Utils
 {
-    public abstract class EmrWorkerBase : IDisposable
+    public abstract class TimerWorkerBase : IDisposable
     {
         private const int timerPeriod = 60000 * 1; //every 1 minute
 
@@ -24,13 +25,11 @@ namespace EmrWorkflow.Run
         private Timer threadTimer;
 
         /// <summary>
-        /// Constructor for injecting dependencies
+        /// Default constructor
         /// </summary>
-        /// <param name="emrJobLogger">Instantiated object to log information about the EMR Job</param>
-        public EmrWorkerBase(IEmrJobLogger emrJobLogger)
+        public TimerWorkerBase()
         {
             this.isBusy = 0;
-            this.EmrJobLogger = emrJobLogger;
             this.threadTimer = new Timer(this.DoWork);
         }
 
@@ -41,11 +40,6 @@ namespace EmrWorkflow.Run
         {
             get { return Thread.VolatileRead(ref this.disposableState) == 0; }
         }
-
-        /// <summary>
-        /// Object to log information about the EMR Job
-        /// </summary>
-        public IEmrJobLogger EmrJobLogger { get; set; }
 
         /// <summary>
         /// Start the worker

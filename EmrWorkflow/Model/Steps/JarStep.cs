@@ -1,5 +1,4 @@
 ﻿using Amazon.ElasticMapReduce;
-using EmrWorkflow.RequestBuilders;
 using System;
 using System.Collections.Generic;
 using System.Xml;

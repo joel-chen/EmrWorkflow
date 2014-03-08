@@ -1,5 +1,4 @@
-﻿using EmrWorkflow.RequestBuilders;
-using System;
+﻿using System;
 using System.Xml;
 
 namespace EmrWorkflow.Model.Configs
