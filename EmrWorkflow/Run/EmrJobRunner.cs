@@ -79,7 +79,7 @@ namespace EmrWorkflow.Run
             this.activities = this.EmrActivitiesEnumerator.GetActivities(this).GetEnumerator();
 
             if ((await this.PushNextActivity()))
-                this.Start();
+                base.Start();
             else
                 this.Dispose();
         }
