@@ -19,9 +19,9 @@ namespace EmrWorkflowDemo
 
             Stopwatch stopwatch = Stopwatch.StartNew();
             RunEmrJob(taskCompletionSourceForEmrJob);
+            string result = emrJobTask.Result ? "success" : "failed"; // The attempt to get the result of emrJobTask blocks the current thread until the completion source gets signaled. 
             stopwatch.Stop();
 
-            string result = emrJobTask.Result ? "success" : "failed"; // The attempt to get the result of emrJobTask blocks the current thread until the completion source gets signaled. 
             long minutes = stopwatch.ElapsedMilliseconds / 1000 / 60;
             Console.WriteLine("Completed in {0} min with result: {1}", minutes, result);
         }

@@ -144,7 +144,7 @@ namespace EmrWorkflow.Run
 
         protected override bool Result
         {
-            get { return this.hasErrors; }
+            get { return !this.hasErrors; }
         }
 
         protected override void DisposeResources()
