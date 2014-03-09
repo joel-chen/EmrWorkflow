@@ -31,12 +31,6 @@ namespace EmrWorkflow.Run
         void PrintAddingNewActivity(string activityName);
 
         /// <summary>
-        /// Print that EMR Job has an error
-        /// </summary>
-        /// <param name="activityInfo">Current state of the job and current activity</param>
-        void PrintError(EmrActivityInfo activityInfo);
-
-        /// <summary>
         /// Print error message
         /// </summary>
         /// <param name="errorMessage">Error message</param>

@@ -63,16 +63,6 @@ namespace EmrWorkflow.Run.Implementation
         }
 
         /// <summary>
-        /// Print that EMR Job has an error
-        /// </summary>
-        /// <param name="activityInfo">Current state of the job and current activity</param>
-        public void PrintError(EmrActivityInfo activityInfo)
-        {
-            String errorMessage = activityInfo.JobFlowDetail.ExecutionStatusDetail.LastStateChangeReason;
-            this.PrintError(String.Format(Resources.Info_FailToRunJobTemplate, errorMessage));
-        }
-
-        /// <summary>
         /// Print error message
         /// </summary>
         /// <param name="errorMessage">Error message</param>

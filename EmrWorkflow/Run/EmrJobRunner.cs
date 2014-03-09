@@ -47,6 +47,11 @@ namespace EmrWorkflow.Run
         public string JobFlowId { get; set; }
 
         /// <summary>
+        /// An error message of the latest problem that occured during the job
+        /// </summary>
+        public string ErrorMessage { get; set; }
+
+        /// <summary>
         /// Settings to replace placeholders
         /// </summary>
         public IBuilderSettings Settings { get; set; }
@@ -99,8 +104,7 @@ namespace EmrWorkflow.Run
             {
                 if (activityInfo.CurrentState == EmrActivityState.Failed)
                 {
-                    this.hasErrors = true;
-                    this.EmrJobLogger.PrintError(activityInfo);
+                    this.SetError(activityInfo);
                     this.EmrActivitiesEnumerator.NotifyJobFailed(this);
                 }
 
@@ -134,15 +138,13 @@ namespace EmrWorkflow.Run
             }
             catch (Exception ex)
             {
-                this.EmrJobLogger.PrintError(String.Format(Resources.Info_ExceptionWhenSendingRequestTemplate, ex.Message));
-                this.hasErrors = true;
+                this.SetError(String.Format(Resources.Info_ExceptionWhenSendingRequestTemplate, ex.Message));
                 return false;
             }
 
             if (String.IsNullOrEmpty(resultJobFlowId))
             {
-                this.EmrJobLogger.PrintError(Resources.Info_EmrServiceNotOkResponse);
-                this.hasErrors = true;
+                this.SetError(Resources.Info_EmrServiceNotOkResponse);
                 return false;
             }
 
@@ -150,7 +152,20 @@ namespace EmrWorkflow.Run
             return true;
         }
 
-        protected override bool Result
+        private void SetError(EmrActivityInfo activityInfo)
+        {
+            string errorMessage = activityInfo.JobFlowDetail.ExecutionStatusDetail.LastStateChangeReason;
+            this.SetError(String.Format(Resources.Info_FailToRunJobTemplate, errorMessage));
+        }
+
+        private void SetError(string errorMessage)
+        {
+            this.hasErrors = true;
+            this.ErrorMessage = errorMessage;
+            this.EmrJobLogger.PrintError(errorMessage);
+        }
+
+        protected override bool WorkerResult
         {
             get { return !this.hasErrors; }
         }

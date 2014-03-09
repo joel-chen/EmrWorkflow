@@ -74,6 +74,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Run\EmrActivitiesIteratorBase.cs" />
+    <Compile Include="SWF\Model\ProcessActivityResult.cs" />
     <Compile Include="SWF\SwfEmrActivitiesIterator.cs" />
     <Compile Include="Utils\JsonSerializer.cs" />
     <Compile Include="Utils\TimerWorkerBase.cs" />

@@ -148,7 +148,7 @@ namespace EmrPlusSwf
             return null;
         }
 
-        protected override bool Result
+        protected override bool WorkerResult
         {
             get { throw new NotImplementedException(); }
         }

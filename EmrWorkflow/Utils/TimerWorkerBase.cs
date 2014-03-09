@@ -79,13 +79,13 @@ namespace EmrWorkflow.Utils
                 this.threadTimer = null;
             }
 
-            this.taskCompletionSource.SetResult(this.Result);
+            this.taskCompletionSource.SetResult(this.WorkerResult);
             this.DisposeResources();
 
             GC.SuppressFinalize(this);
         }
 
-        protected abstract TResult Result { get; }
+        protected abstract TResult WorkerResult { get; }
 
         protected virtual void DisposeResources()
         {
