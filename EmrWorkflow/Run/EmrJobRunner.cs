@@ -109,6 +109,12 @@ namespace EmrWorkflow.Run
             }
         }
 
+        /// <summary>
+        /// Push next acivity fromt the list
+        /// </summary>
+        /// <returns>True - activity was successfully sent to EMR,
+        /// False - either no more activities or an erorr occured while sending a request to EMR
+        /// </returns>
         private async Task<bool> PushNextActivity()
         {
             if (!this.activities.MoveNext())
@@ -129,12 +135,14 @@ namespace EmrWorkflow.Run
             catch (Exception ex)
             {
                 this.EmrJobLogger.PrintError(String.Format(Resources.Info_ExceptionWhenSendingRequestTemplate, ex.Message));
+                this.hasErrors = true;
                 return false;
             }
 
             if (String.IsNullOrEmpty(resultJobFlowId))
             {
                 this.EmrJobLogger.PrintError(Resources.Info_EmrServiceNotOkResponse);
+                this.hasErrors = true;
                 return false;
             }
 
