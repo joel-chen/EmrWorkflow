@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace EmrWorkflow.SWF
 {
-    public class SwfEmrJobActivityProcessor : TimerWorkerBase
+    public class SwfEmrJobActivityProcessor : TimerWorkerBase<bool>
     {
         /// <summary>
         /// Constructor for injecting dependencies
@@ -60,7 +60,7 @@ namespace EmrWorkflow.SWF
             ActivityTask activityTask = await this.Poll();
             if (!String.IsNullOrEmpty(activityTask.TaskToken))
             {
-                SwfEmrActivity activityState = ProcessTask(activityTask.Input);
+                SwfEmrActivity activityState = await ProcessTask(activityTask.Input);
                 //CompleteTask(activityTask.TaskToken, activityState);
             }
         }
@@ -81,7 +81,7 @@ namespace EmrWorkflow.SWF
             return response.ActivityTask;
         }
 
-        private SwfEmrActivity ProcessTask(string input)
+        private async Task<SwfEmrActivity> ProcessTask(string input)
         {
             SwfEmrActivity swfActivity = JsonSerializer.Deserialize<SwfEmrActivity>(input);
             EmrActivitiesIteratorBase activitiesIterator = new SwfEmrActivitiesIterator(swfActivity);
@@ -89,15 +89,15 @@ namespace EmrWorkflow.SWF
             using (EmrJobRunner emrRunner = new EmrJobRunner(this.EmrJobLogger, this.EmrJobStateChecker, this.EmrClient, this.Settings, activitiesIterator))
             {
                 emrRunner.JobFlowId = swfActivity.JobFlowId;
-                /*emrRunner.Start();
-
-                while (emrRunner.IsRunning)
-                {
-                    Thread.Sleep(5000);
-                }*/
+                bool result = await emrRunner.Start();
             }
 
             return null;
+        }
+
+        protected override bool Result
+        {
+            get { throw new NotImplementedException(); }
         }
     }
 }

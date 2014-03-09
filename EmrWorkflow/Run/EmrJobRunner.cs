@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace EmrWorkflow.Run
 {
-    public class EmrJobRunner : TimerWorkerBase
+    public class EmrJobRunner : TimerWorkerBase<bool>
     {
         /// <summary>
         /// Internal field to indicate if job had errors
@@ -74,14 +74,16 @@ namespace EmrWorkflow.Run
         /// <summary>
         /// Start the job flow
         /// </summary>
-        public override async void Start()
+        public override async Task<bool> Start()
         {
             this.activities = this.EmrActivitiesEnumerator.GetActivities(this).GetEnumerator();
 
             if ((await this.PushNextActivity()))
-                base.Start();
+                return await base.Start();
             else
                 this.Dispose();
+
+            return false;
         }
 
         protected async override void DoWorkSafe()
@@ -138,6 +140,11 @@ namespace EmrWorkflow.Run
 
             this.JobFlowId = resultJobFlowId;
             return true;
+        }
+
+        protected override bool Result
+        {
+            get { return this.hasErrors; }
         }
 
         protected override void DisposeResources()

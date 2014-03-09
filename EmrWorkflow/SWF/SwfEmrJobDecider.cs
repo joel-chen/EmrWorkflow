@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace EmrPlusSwf
 {
-    public class SwfEmrJobDecider : TimerWorkerBase
+    public class SwfEmrJobDecider : TimerWorkerBase<bool>
     {
         /// <summary>
         /// Constructor for injecting dependencies
@@ -146,6 +146,11 @@ namespace EmrPlusSwf
             }
 
             return null;
+        }
+
+        protected override bool Result
+        {
+            get { throw new NotImplementedException(); }
         }
     }
 }

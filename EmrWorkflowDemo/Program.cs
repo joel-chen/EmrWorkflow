@@ -4,13 +4,29 @@ using EmrWorkflow.RequestBuilders;
 using EmrWorkflow.Run;
 using EmrWorkflow.Run.Implementation;
 using System;
+using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace EmrWorkflowDemo
 {
     public class Program
     {
         public static void Main(string[] args)
+        {
+            TaskCompletionSource<bool> taskCompletionSourceForEmrJob = new TaskCompletionSource<bool>();
+            Task<bool> emrJobTask = taskCompletionSourceForEmrJob.Task;
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            RunEmrJob(taskCompletionSourceForEmrJob);
+            stopwatch.Stop();
+
+            string result = emrJobTask.Result ? "success" : "failed"; // The attempt to get the result of emrJobTask blocks the current thread until the completion source gets signaled. 
+            long minutes = stopwatch.ElapsedMilliseconds / 1000 / 60;
+            Console.WriteLine("Completed in {0} min with result: {1}", minutes, result);
+        }
+
+        private static async void RunEmrJob(TaskCompletionSource<bool> taskCompletionSourceForEmrJob)
         {
             //Create dependencies
             IBuilderSettings settings = Program.CreateSettings();
@@ -24,12 +40,8 @@ namespace EmrWorkflowDemo
                 //explicitly set an existing jobFlowId, if you want to work with an existing job
                 //emrRunner.JobFlowId = "j-36G3NHTVEP1Q7";
 
-                emrRunner.Start();
-
-                while (emrRunner.IsRunning)
-                {
-                    Thread.Sleep(5000);
-                }
+                bool result = await emrRunner.Start();
+                taskCompletionSourceForEmrJob.SetResult(result);
             }
         }
 

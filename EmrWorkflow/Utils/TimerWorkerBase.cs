@@ -1,10 +1,11 @@
 ﻿using EmrWorkflow.Run;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace EmrWorkflow.Utils
 {
-    public abstract class TimerWorkerBase : IDisposable
+    public abstract class TimerWorkerBase<TResult> : IDisposable
     {
         private const int timerPeriod = 60000 * 1; //every 1 minute
 
@@ -12,6 +13,11 @@ namespace EmrWorkflow.Utils
         /// Internal field used for sync access to the <see cref="CheckStatus"/> method called by the timer
         /// </summary>
         private int isBusy;
+
+        /// <summary>
+        /// Result of the worker
+        /// </summary>
+        private TaskCompletionSource<TResult> taskCompletionSource;
 
         /// <summary>
         /// A value which indicates the disposable state. 0 indicates undisposed, 1 indicates disposing
@@ -31,22 +37,16 @@ namespace EmrWorkflow.Utils
         {
             this.isBusy = 0;
             this.threadTimer = new Timer(this.DoWork);
-        }
-
-        /// <summary>
-        /// If the job is running
-        /// </summary>
-        public bool IsRunning
-        {
-            get { return Thread.VolatileRead(ref this.disposableState) == 0; }
+            this.taskCompletionSource = new TaskCompletionSource<TResult>(this.threadTimer);
         }
 
         /// <summary>
         /// Start the worker
         /// </summary>
-        public virtual void Start()
+        public virtual Task<TResult> Start()
         {
             this.threadTimer.Change(0, timerPeriod);
+            return this.taskCompletionSource.Task;
         }
 
         private void DoWork(Object stateInfo)
@@ -79,10 +79,13 @@ namespace EmrWorkflow.Utils
                 this.threadTimer = null;
             }
 
+            this.taskCompletionSource.SetResult(this.Result);
             this.DisposeResources();
 
             GC.SuppressFinalize(this);
         }
+
+        protected abstract TResult Result { get; }
 
         protected virtual void DisposeResources()
         {
