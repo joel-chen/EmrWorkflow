@@ -116,7 +116,7 @@ namespace EmrWorkflow.Run
             }
 
             EmrActivityStrategy activity = this.activities.Current;
-            this.EmrJobLogger.PrintAddingNewActivity(activity);
+            this.EmrJobLogger.PrintAddingNewActivity(activity.Name);
 
             //TODO: probably add a retry cycle
             string resultJobFlowId;

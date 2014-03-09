@@ -3,6 +3,7 @@ using Amazon.SimpleWorkflow;
 using Amazon.SimpleWorkflow.Model;
 using EmrWorkflow.RequestBuilders;
 using EmrWorkflow.Run;
+using EmrWorkflow.Run.Strategies;
 using EmrWorkflow.SWF.Model;
 using EmrWorkflow.Utils;
 using System;
@@ -10,28 +11,34 @@ using System.Threading.Tasks;
 
 namespace EmrWorkflow.SWF
 {
-    public class SwfEmrActivityProcessor : TimerWorkerBase
+    public class SwfEmrJobActivityProcessor : TimerWorkerBase
     {
         /// <summary>
         /// Constructor for injecting dependencies
         /// </summary>
         /// <param name="emrJobLogger">Instantiated object to log information about the EMR Job</param>
+        /// <param name="emrJobStateChecker">Instantiated object to check the current state of the EMR Job</param>
         /// <param name="settings">Settings to replace placeholders</param>
         /// <param name="emrClient">Instantiated EMR Client to make requests to the Amazon EMR Service</param>
         /// <param name="swfClient">Instantiated SWF Client to make requests to the Amazon SWF Service</param>
-        public SwfEmrActivityProcessor(IEmrJobLogger emrJobLogger, IBuilderSettings settings, IAmazonElasticMapReduce emrClient, IAmazonSimpleWorkflow swfClient)
+        public SwfEmrJobActivityProcessor(IEmrJobLogger emrJobLogger, IEmrJobStateChecker emrJobStateChecker, IBuilderSettings settings, IAmazonElasticMapReduce emrClient, IAmazonSimpleWorkflow swfClient)
         {
             this.EmrJobLogger = emrJobLogger;
+            this.EmrJobStateChecker = emrJobStateChecker;
             this.Settings = settings;
             this.EmrClient = emrClient;
             this.SwfClient = swfClient;
-            this.ActivitiesFactory = new EmrActivitiesFactory();
         }
 
         /// <summary>
         /// Object to log information about the EMR Job
         /// </summary>
         public IEmrJobLogger EmrJobLogger { get; set; }
+
+        /// <summary>
+        /// Object to check the current state of the EMR Job
+        /// </summary>
+        public IEmrJobStateChecker EmrJobStateChecker { get; set; }
 
         /// <summary>
         /// Settings to replace placeholders
@@ -47,8 +54,6 @@ namespace EmrWorkflow.SWF
         /// SWF Client to make requests to the Amazon SWF Service
         /// </summary>
         public IAmazonSimpleWorkflow SwfClient { get; set; }
-
-        public EmrActivitiesFactory ActivitiesFactory { get; set; }
 
         protected async override void DoWorkSafe()
         {
@@ -68,7 +73,7 @@ namespace EmrWorkflow.SWF
                 Domain = Constants.EmrJobDomain,
                 TaskList = new TaskList()
                 {
-                    Name = ""//Constants.ImageProcessingActivityTaskList
+                    Name = Constants.EmrJobTasksList
                 }
             };
 
@@ -78,14 +83,20 @@ namespace EmrWorkflow.SWF
 
         private SwfEmrActivity ProcessTask(string input)
         {
-            /*
-            SwfEmrActivity activity = Utils.DeserializeFromJSON<ActivityState>(input);
-            EmrActivityStrategy strategy = this.ActivitiesFactory.CreateStrategy(activity);
+            SwfEmrActivity swfActivity = JsonSerializer.Deserialize<SwfEmrActivity>(input);
+            EmrActivitiesIteratorBase activitiesIterator = new SwfEmrActivitiesIterator(swfActivity);
 
-            this.EmrJobLogger.PrintAddingNewActivity(strategy);
-            bool await strategy.PushAsync(this);
+            using (EmrJobRunner emrRunner = new EmrJobRunner(this.EmrJobLogger, this.EmrJobStateChecker, this.EmrClient, this.Settings, activitiesIterator))
+            {
+                emrRunner.JobFlowId = swfActivity.JobFlowId;
+                /*emrRunner.Start();
 
-            return activityState;*/
+                while (emrRunner.IsRunning)
+                {
+                    Thread.Sleep(5000);
+                }*/
+            }
+
             return null;
         }
     }

@@ -1,7 +1,6 @@
 ﻿using Amazon.ElasticMapReduce;
 using Amazon.ElasticMapReduce.Model;
 using EmrWorkflow.Run.Model;
-using EmrWorkflow.Run.Strategies;
 using System;
 
 namespace EmrWorkflow.Run.Implementation
@@ -55,11 +54,11 @@ namespace EmrWorkflow.Run.Implementation
         /// <summary>
         /// Print that a process is adding new activity to the EMR Job
         /// </summary>
-        /// <param name="activity">A new activity to be added to the EMR Job</param>
-        public void PrintAddingNewActivity(EmrActivityStrategy activity)
+        /// <param name="activityName">An activity's name to be added to the EMR Job</param>
+        public void PrintAddingNewActivity(string activityName)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(String.Format(Resources.Info_AddingActivityTemplate, activity.Name));
+            Console.WriteLine(String.Format(Resources.Info_AddingActivityTemplate, activityName));
             Console.ResetColor();
         }
 

@@ -1,5 +1,4 @@
 ﻿using EmrWorkflow.Run.Model;
-using EmrWorkflow.Run.Strategies;
 
 namespace EmrWorkflow.Run
 {
@@ -28,8 +27,8 @@ namespace EmrWorkflow.Run
         /// <summary>
         /// Print that a process is adding new activity to the EMR Job
         /// </summary>
-        /// <param name="activity">A new activity to be added to the EMR Job</param>
-        void PrintAddingNewActivity(EmrActivityStrategy activity);
+        /// <param name="activityName">An activity's name to be added to the EMR Job</param>
+        void PrintAddingNewActivity(string activityName);
 
         /// <summary>
         /// Print that EMR Job has an error

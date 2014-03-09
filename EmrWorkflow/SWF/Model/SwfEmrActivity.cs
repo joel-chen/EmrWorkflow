@@ -10,13 +10,13 @@ namespace EmrWorkflow.SWF.Model
         public string Name { get; set; }
 
         /// <summary>
-        /// Path to the XML-file that describes activity
-        /// </summary>
-        public string FilePath { get; set; }
-
-        /// <summary>
         /// EMR Activity type
         /// </summary>
         public EmrActivityType Type { get; set; }
+
+        /// <summary>
+        /// Current jobflow's id
+        /// </summary>
+        public string JobFlowId { get; set; }
     }
 }

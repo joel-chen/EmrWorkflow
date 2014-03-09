@@ -1,11 +1,10 @@
-﻿using Amazon.ElasticMapReduce;
-using Amazon.SimpleWorkflow;
+﻿using Amazon.SimpleWorkflow;
 using Amazon.SimpleWorkflow.Model;
-using EmrWorkflow.RequestBuilders;
 using EmrWorkflow.Run;
 using EmrWorkflow.Run.Model;
 using EmrWorkflow.SWF.Model;
 using EmrWorkflow.Utils;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -17,14 +16,10 @@ namespace EmrPlusSwf
         /// Constructor for injecting dependencies
         /// </summary>
         /// <param name="emrJobLogger">Instantiated object to log information about the EMR Job</param>
-        /// <param name="emrJobStateChecker">Instantiated object to check the current state of the EMR Job</param>
-        /// <param name="emrClient">Instantiated EMR Client to make requests to the Amazon EMR Service</param>
         /// <param name="swfClient">Instantiated SWF Client to make requests to the Amazon SWF Service</param>
-        public SwfEmrJobDecider(IEmrJobLogger emrJobLogger, IEmrJobStateChecker emrJobStateChecker, IAmazonElasticMapReduce emrClient, IAmazonSimpleWorkflow swfClient)
+        public SwfEmrJobDecider(IEmrJobLogger emrJobLogger, IAmazonSimpleWorkflow swfClient)
         {
             this.EmrJobLogger = emrJobLogger;
-            this.EmrJobStateChecker = emrJobStateChecker;
-            this.EmrClient = emrClient;
             this.SwfClient = swfClient;
         }
 
@@ -32,16 +27,6 @@ namespace EmrPlusSwf
         /// Object to log information about the EMR Job
         /// </summary>
         public IEmrJobLogger EmrJobLogger { get; set; }
-
-        /// <summary>
-        /// Object to check the current state of the EMR Job
-        /// </summary>
-        public IEmrJobStateChecker EmrJobStateChecker { get; set; }
-
-        /// <summary>
-        /// EMR Client to make requests to the Amazon EMR Service
-        /// </summary>
-        public IAmazonElasticMapReduce EmrClient { get; set; }
 
         /// <summary>
         /// SWF Client to make requests to the Amazon SWF Service
@@ -54,7 +39,7 @@ namespace EmrPlusSwf
             if (!string.IsNullOrEmpty(task.TaskToken))
             {
                 //Create the next set of decision based on the current state of the EMR Job
-                List<Decision> decisions = await this.Decide();
+                List<Decision> decisions = this.Decide(task);
 
                 //Complete the task with the new set of decisions
                 //CompleteTask(task.TaskToken, decisions);
@@ -67,40 +52,100 @@ namespace EmrPlusSwf
             PollForDecisionTaskRequest request = new PollForDecisionTaskRequest()
             {
                 Domain = Constants.EmrJobDomain,
-                TaskList = new TaskList()
-                {
-                    Name = Constants.EmrJobTasksList
-                }
+                TaskList = new TaskList() { Name = Constants.EmrJobTasksList }
             };
 
             PollForDecisionTaskResponse response = await this.SwfClient.PollForDecisionTaskAsync(request);
             return response.DecisionTask;
         }
 
-        private async Task<List<Decision>> Decide()
+        private List<Decision> Decide(DecisionTask task)
         {
-            this.EmrJobLogger.PrintCheckingStatus();
-            //TODO: implement reading jobflowId from task
-            EmrActivityInfo activityInfo = await this.EmrJobStateChecker.CheckAsync(this.EmrClient, ""/*this.JobFlowId*/);
-
             List<Decision> decisions = new List<Decision>();
 
-            if (activityInfo.CurrentState == EmrActivityState.Running)
+            SwfEmrActivity latestActivity = null;
+            HistoryEvent latestEvent = task.Events[0];
+            if (latestEvent.EventType == EventType.ActivityTaskCompleted)
             {
-                this.EmrJobLogger.PrintJobInfo(activityInfo);
+                latestActivity = JsonSerializer.Deserialize<SwfEmrActivity>(latestEvent.ActivityTaskCompletedEventAttributes.Result);
             }
-            else
-            {
-                if (activityInfo.CurrentState == EmrActivityState.Failed)
-                {
-                    this.EmrJobLogger.PrintError(activityInfo);
-                    //TODO: add a decision to start next activity for the failed flow
-                }
 
-                //TODO: add a decision to start next activity
-            }
+            SwfEmrActivity nextActivity = this.CreateNextEmrActivity(latestActivity);
+
+            if (nextActivity == null)
+                decisions.Add(this.CreateCompleteWorkflowExecutionDecision());
+            else
+                decisions.Add(this.CreateActivityDecision(nextActivity));
 
             return decisions;
+        }
+
+        private Decision CreateActivityDecision(SwfEmrActivity nextActivity)
+        {
+            Decision decision = new Decision()
+            {
+                DecisionType = DecisionType.ScheduleActivityTask,
+                ScheduleActivityTaskDecisionAttributes = new ScheduleActivityTaskDecisionAttributes()
+                {
+                    ActivityType = new ActivityType()
+                    {
+                        Name = Constants.EmrJobActivityName,
+                        Version = Constants.EmrJobActivityVersion
+                    },
+                    ActivityId = Constants.ActivityIdPrefix + DateTime.Now.TimeOfDay,
+                    Input = JsonSerializer.Serialize<SwfEmrActivity>(nextActivity)
+                }
+            };
+
+            this.EmrJobLogger.PrintAddingNewActivity(nextActivity.Name);
+            return decision;
+        }
+
+        private Decision CreateCompleteWorkflowExecutionDecision()
+        {
+            Decision decision = new Decision()
+            {
+                DecisionType = DecisionType.CompleteWorkflowExecution,
+                CompleteWorkflowExecutionDecisionAttributes = new CompleteWorkflowExecutionDecisionAttributes
+                {
+                    Result = "TODO:// Add result failed or succeeded. Iterate through the history and check failed activities?"
+                }
+            };
+
+            this.EmrJobLogger.PrintInfo("Decision: Complete Workflow Execution");
+            return decision;
+        }
+
+        private SwfEmrActivity CreateNextEmrActivity(SwfEmrActivity previousActivity)
+        {
+            if (previousActivity == null)
+            {
+                return new SwfEmrActivity()
+                {
+                    Name = "startCluster",
+                    Type = EmrActivityType.StartJob
+                };
+            }
+
+            switch (previousActivity.Name)
+            {
+                case "startCluster":
+                    return new SwfEmrActivity()
+                    {
+                        Name = "runSteps",
+                        JobFlowId = previousActivity.JobFlowId,
+                        Type = EmrActivityType.AddSteps
+                    };
+                case "runSteps":
+                    return new SwfEmrActivity()
+                    {
+                        Name = "terminateCluster",
+                        JobFlowId = previousActivity.JobFlowId,
+                        Type = EmrActivityType.TerminateJob
+                    };
+            }
+
+            return null;
         }
     }
 }
