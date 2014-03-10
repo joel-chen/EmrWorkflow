@@ -1,6 +1,6 @@
 ﻿using EmrWorkflow.Run;
 using EmrWorkflow.Run.Model;
-using EmrWorkflow.Run.Strategies;
+using EmrWorkflow.Run.Activities;
 using EmrWorkflow.SWF.Model;
 using System;
 using System.Collections.Generic;
@@ -13,19 +13,19 @@ namespace EmrWorkflow.SWF
     /// </summary>
     class SwfSingleEmrActivityIterator : EmrActivitiesIteratorBase
     {
-        private EmrActivityStrategy emrActivity;
+        private EmrActivity emrActivity;
 
         public SwfSingleEmrActivityIterator(SwfEmrActivity swfActivity)
         {
             this.emrActivity = SwfSingleEmrActivityIterator.CreateStrategy(swfActivity);
         }
 
-        protected override IEnumerable<EmrActivityStrategy> GetNormalFlow(EmrJobRunner emrRunner)
+        protected override IEnumerable<EmrActivity> GetNormalFlow(EmrActivitiesRunner emrRunner)
         {
             yield return this.emrActivity;
         }
 
-        private static EmrActivityStrategy CreateStrategy(SwfEmrActivity swfActivity)
+        private static EmrActivity CreateStrategy(SwfEmrActivity swfActivity)
         {
             XmlDocument xml = new XmlDocument();
             xml.Load(swfActivity.Name); //TODO: can be an extra logic for retrieving files, for example downloading from S3
@@ -33,13 +33,13 @@ namespace EmrWorkflow.SWF
             switch (swfActivity.Type)
             {
                 case EmrActivityType.StartJob:
-                    return new StartJobStrategy(swfActivity.Name, xml);
+                    return new StartJobActivity(swfActivity.Name, xml);
 
                 case EmrActivityType.AddSteps:
-                    return new AddStepsStrategy(swfActivity.Name, xml);
+                    return new AddStepsActivity(swfActivity.Name, xml);
 
                 case EmrActivityType.TerminateJob:
-                    return new TerminateJobStrategy(swfActivity.Name);
+                    return new TerminateJobActivity(swfActivity.Name);
 
                 default:
                     throw new InvalidOperationException(string.Format(SwfResources.E_UnsupportedEmrActivityTypeTemplate, swfActivity.Type));

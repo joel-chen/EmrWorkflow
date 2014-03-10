@@ -93,7 +93,7 @@ namespace EmrWorkflow.SWF
                 SwfEmrActivity swfActivity = JsonSerializer.Deserialize<SwfEmrActivity>(input);
                 SwfSingleEmrActivityIterator singleEmrActivityIterator = new SwfSingleEmrActivityIterator(swfActivity);
 
-                using (EmrJobRunner emrRunner = new EmrJobRunner(this.EmrJobLogger, this.EmrJobStateChecker, this.EmrClient, this.Settings, singleEmrActivityIterator))
+                using (EmrActivitiesRunner emrRunner = new EmrActivitiesRunner(this.EmrJobLogger, this.EmrJobStateChecker, this.EmrClient, this.Settings, singleEmrActivityIterator))
                 {
                     emrRunner.JobFlowId = swfActivity.JobFlowId; //set JobFlowId for the current activity
                     bool emrJobOk = await emrRunner.Start();

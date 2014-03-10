@@ -1,5 +1,5 @@
 ﻿using EmrWorkflow.Run.Implementation;
-using EmrWorkflow.Run.Strategies;
+using EmrWorkflow.Run.Activities;
 using System.Collections.Generic;
 
 namespace EmrWorkflow.Run
@@ -14,13 +14,13 @@ namespace EmrWorkflow.Run
         /// </summary>
         private bool hasError = false;
 
-        public IEnumerable<EmrActivityStrategy> GetActivities(EmrJobRunner emrRunner)
+        public IEnumerable<EmrActivity> GetActivities(EmrActivitiesRunner emrRunner)
         {
-            foreach (EmrActivityStrategy successFlowActivity in this.GetNormalFlow(emrRunner))
+            foreach (EmrActivity successFlowActivity in this.GetNormalFlow(emrRunner))
             {
                 if (this.hasError)
                 {
-                    foreach (EmrActivityStrategy failedFlowActivity in this.GetFailedFlow(emrRunner))
+                    foreach (EmrActivity failedFlowActivity in this.GetFailedFlow(emrRunner))
                     {
                         yield return failedFlowActivity;
                     }
@@ -39,7 +39,7 @@ namespace EmrWorkflow.Run
         /// or ignore it =)
         /// </summary>
         /// <param name="emrRunner">Reference to the emrRunner</param>
-        public virtual void NotifyJobFailed(EmrJobRunner emrRunner)
+        public virtual void NotifyJobFailed(EmrActivitiesRunner emrRunner)
         {
             this.hasError = true;
         }
@@ -49,14 +49,14 @@ namespace EmrWorkflow.Run
         /// </summary>
         /// <param name="emrRunner">Reference to the emrRunner</param>
         /// <returns>Sequence of good activities</returns>
-        protected abstract IEnumerable<EmrActivityStrategy> GetNormalFlow(EmrJobRunner emrRunner);
+        protected abstract IEnumerable<EmrActivity> GetNormalFlow(EmrActivitiesRunner emrRunner);
 
         /// <summary>
         /// A sequence of activities, if an error has occurred
         /// </summary>
         /// <param name="emrRunner">Reference to the emrRunner</param>
         /// <returns>Sequence of bad activities</returns>
-        protected virtual IEnumerable<EmrActivityStrategy> GetFailedFlow(EmrJobRunner emrRunner)
+        protected virtual IEnumerable<EmrActivity> GetFailedFlow(EmrActivitiesRunner emrRunner)
         {
             yield break;
         }

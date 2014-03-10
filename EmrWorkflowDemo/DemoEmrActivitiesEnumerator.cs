@@ -1,6 +1,6 @@
 ﻿using EmrWorkflow.Run;
 using EmrWorkflow.Run.Implementation;
-using EmrWorkflow.Run.Strategies;
+using EmrWorkflow.Run.Activities;
 using System;
 using System.Collections.Generic;
 using System.Xml;
@@ -9,32 +9,32 @@ namespace EmrWorkflowDemo
 {
     public class DemoEmrActivitiesEnumerator : EmrActivitiesIteratorBase
     {
-        protected override IEnumerable<EmrActivityStrategy> GetNormalFlow(EmrJobRunner emrRunner)
+        protected override IEnumerable<EmrActivity> GetNormalFlow(EmrActivitiesRunner emrRunner)
         {
             if (String.IsNullOrEmpty(emrRunner.JobFlowId))
                 yield return this.CreateStartActivity();
 
             yield return this.CreateAddStepsActivity();
-            yield return new TerminateJobStrategy("Job succeeded. terminate cluster");
+            yield return new TerminateJobActivity("Job succeeded. terminate cluster");
         }
 
-        protected override IEnumerable<EmrActivityStrategy> GetFailedFlow(EmrJobRunner emrRunner)
+        protected override IEnumerable<EmrActivity> GetFailedFlow(EmrActivitiesRunner emrRunner)
         {
-            yield return new TerminateJobStrategy("Job failed. terminate cluster");
+            yield return new TerminateJobActivity("Job failed. terminate cluster");
         }
 
-        private EmrActivityStrategy CreateStartActivity()
+        private EmrActivity CreateStartActivity()
         {
             XmlDocument jobFlowXml = new XmlDocument();
             jobFlowXml.Load("Workflow/JobConfig.xml");
-            return new StartJobStrategy("start and configure job", jobFlowXml);
+            return new StartJobActivity("start and configure job", jobFlowXml);
         }
 
-        private EmrActivityStrategy CreateAddStepsActivity()
+        private EmrActivity CreateAddStepsActivity()
         {
             XmlDocument stepsXml = new XmlDocument();
             stepsXml.Load("Workflow/Steps.xml");
-            return new AddStepsStrategy("first activity", stepsXml);
+            return new AddStepsActivity("first activity", stepsXml);
         }
     }
 }

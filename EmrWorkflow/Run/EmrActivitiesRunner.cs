@@ -1,7 +1,7 @@
 ﻿using Amazon.ElasticMapReduce;
 using EmrWorkflow.RequestBuilders;
+using EmrWorkflow.Run.Activities;
 using EmrWorkflow.Run.Model;
-using EmrWorkflow.Run.Strategies;
 using EmrWorkflow.Utils;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace EmrWorkflow.Run
 {
-    public class EmrJobRunner : TimerWorkerBase<bool>
+    public class EmrActivitiesRunner : TimerWorkerBase<bool>
     {
         /// <summary>
         /// Internal field to indicate if job had errors
@@ -19,7 +19,7 @@ namespace EmrWorkflow.Run
         /// <summary>
         /// A reference to the activities list from the <see cref="EmrActivitiesEnumerator"/>
         /// </summary>
-        private IEnumerator<EmrActivityStrategy> activities;
+        private IEnumerator<EmrActivity> activities;
 
         /// <summary>
         /// Constructor for injecting dependencies
@@ -29,7 +29,7 @@ namespace EmrWorkflow.Run
         /// <param name="emrClient">Instantiated EMR Client to make requests to the Amazon EMR Service</param>
         /// <param name="settings">Settings to replace placeholders</param>
         /// <param name="emrActivitiesEnumerator">Iterator through the job flow's activities</param>
-        public EmrJobRunner(IEmrJobLogger emrJobLogger, IEmrJobStateChecker emrJobStateChecker, IAmazonElasticMapReduce emrClient, IBuilderSettings settings, EmrActivitiesIteratorBase emrActivitiesEnumerator)
+        public EmrActivitiesRunner(IEmrJobLogger emrJobLogger, IEmrJobStateChecker emrJobStateChecker, IAmazonElasticMapReduce emrClient, IBuilderSettings settings, EmrActivitiesIteratorBase emrActivitiesEnumerator)
         {
             this.hasErrors = false;
             this.Settings = settings;
@@ -127,14 +127,14 @@ namespace EmrWorkflow.Run
                 return false;
             }
 
-            EmrActivityStrategy activity = this.activities.Current;
+            EmrActivity activity = this.activities.Current;
             this.EmrJobLogger.PrintAddingNewActivity(activity.Name);
 
             //TODO: probably add a retry cycle
             string resultJobFlowId;
             try
             {
-                resultJobFlowId = await activity.PushAsync(this.EmrClient, this.Settings, this.JobFlowId);
+                resultJobFlowId = await activity.SendAsync(this.EmrClient, this.Settings, this.JobFlowId);
             }
             catch (Exception ex)
             {

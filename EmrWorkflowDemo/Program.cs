@@ -35,7 +35,7 @@ namespace EmrWorkflowDemo
             IEmrJobStateChecker emrJobStateChecker = new EmrJobStateChecker();
             DemoEmrActivitiesEnumerator activitiesIterator = new DemoEmrActivitiesEnumerator();
 
-            using (EmrJobRunner emrRunner = new EmrJobRunner(emrJobLogger, emrJobStateChecker, emrClient, settings, activitiesIterator))
+            using (EmrActivitiesRunner emrRunner = new EmrActivitiesRunner(emrJobLogger, emrJobStateChecker, emrClient, settings, activitiesIterator))
             {
                 //explicitly set an existing jobFlowId, if you want to work with an existing job
                 //emrRunner.JobFlowId = "j-36G3NHTVEP1Q7";

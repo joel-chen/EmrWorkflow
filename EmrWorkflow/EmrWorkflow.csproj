@@ -90,10 +90,10 @@
     <Compile Include="Run\IEmrJobStateChecker.cs" />
     <Compile Include="Run\Model\EmrActivityInfo.cs" />
     <Compile Include="Run\Model\EmrActivityState.cs" />
-    <Compile Include="Run\Strategies\AddStepsStrategy.cs" />
-    <Compile Include="Run\Strategies\EmrActivityStrategy.cs" />
-    <Compile Include="Run\Strategies\StartJobStrategy.cs" />
-    <Compile Include="Run\Strategies\TerminateJobStrategy.cs" />
+    <Compile Include="Run\Activities\AddStepsActivity.cs" />
+    <Compile Include="Run\Activities\EmrActivity.cs" />
+    <Compile Include="Run\Activities\StartJobActivity.cs" />
+    <Compile Include="Run\Activities\TerminateJobActivity.cs" />
     <Compile Include="Run\Model\EmrActivityType.cs" />
     <Compile Include="SWF\Model\Constants.cs" />
     <Compile Include="SWF\Model\SwfEmrActivity.cs" />
