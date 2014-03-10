@@ -74,8 +74,13 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Run\EmrActivitiesIteratorBase.cs" />
+    <Compile Include="SwfResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SwfResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="SWF\Model\ProcessActivityResult.cs" />
-    <Compile Include="SWF\SwfEmrActivitiesIterator.cs" />
+    <Compile Include="SWF\SwfSingleEmrActivityIterator.cs" />
     <Compile Include="Utils\JsonSerializer.cs" />
     <Compile Include="Utils\TimerWorkerBase.cs" />
     <Compile Include="Run\Implementation\EmrJobLogger.cs" />
@@ -102,6 +107,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="SwfResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SwfResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Xsd\EmrBootstrapAction.xsd" />
     <EmbeddedResource Include="Xsd\EmrBootstrapActions.xsd" />
     <EmbeddedResource Include="Xsd\EmrConfig.xsd" />

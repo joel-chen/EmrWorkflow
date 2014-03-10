@@ -8,13 +8,16 @@ using System.Xml;
 
 namespace EmrWorkflow.SWF
 {
-    class SwfEmrActivitiesIterator : EmrActivitiesIteratorBase
+    /// <summary>
+    /// Creates an iterator for one EMR Activity
+    /// </summary>
+    class SwfSingleEmrActivityIterator : EmrActivitiesIteratorBase
     {
         private EmrActivityStrategy emrActivity;
 
-        public SwfEmrActivitiesIterator(SwfEmrActivity swfActivity)
+        public SwfSingleEmrActivityIterator(SwfEmrActivity swfActivity)
         {
-            this.emrActivity = SwfEmrActivitiesIterator.CreateStrategy(swfActivity);
+            this.emrActivity = SwfSingleEmrActivityIterator.CreateStrategy(swfActivity);
         }
 
         protected override IEnumerable<EmrActivityStrategy> GetNormalFlow(EmrJobRunner emrRunner)
@@ -39,8 +42,7 @@ namespace EmrWorkflow.SWF
                     return new TerminateJobStrategy(swfActivity.Name);
 
                 default:
-                    //TODO: handel this situation
-                    throw new Exception();
+                    throw new InvalidOperationException(string.Format(SwfResources.E_UnsupportedEmrActivityTypeTemplate, swfActivity.Type));
             }
         }
     }
