@@ -17,7 +17,7 @@ namespace EmrWorkflow.Run
         private bool hasErrors;
 
         /// <summary>
-        /// A reference to the activities list from the <see cref="EmrActivitiesEnumerator"/>
+        /// A reference to the activities list from the <see cref="EmrActivitiesIterator"/>
         /// </summary>
         private IEnumerator<EmrActivity> activities;
 
@@ -36,7 +36,7 @@ namespace EmrWorkflow.Run
             this.EmrClient = emrClient;
             this.EmrJobLogger = emrJobLogger;
             this.EmrJobStateChecker = emrJobStateChecker;
-            this.EmrActivitiesEnumerator = emrActivitiesEnumerator;
+            this.EmrActivitiesIterator = emrActivitiesEnumerator;
         }
 
         /// <summary>
@@ -74,16 +74,16 @@ namespace EmrWorkflow.Run
         /// <summary>
         /// Iterator through the job flow's activities
         /// </summary>
-        public EmrActivitiesIteratorBase EmrActivitiesEnumerator { get; set; }
+        public EmrActivitiesIteratorBase EmrActivitiesIterator { get; set; }
 
         /// <summary>
         /// Start the job flow
         /// </summary>
         public override async Task<bool> Start()
         {
-            this.activities = this.EmrActivitiesEnumerator.GetActivities(this).GetEnumerator();
+            this.activities = this.EmrActivitiesIterator.GetActivities(this).GetEnumerator();
 
-            if ((await this.PushNextActivity()))
+            if ((await this.SendNextActivity()))
                 return await base.Start();
             else
                 this.Dispose();
@@ -105,10 +105,10 @@ namespace EmrWorkflow.Run
                 if (activityInfo.CurrentState == EmrActivityState.Failed)
                 {
                     this.SetError(activityInfo);
-                    this.EmrActivitiesEnumerator.NotifyJobFailed(this);
+                    this.EmrActivitiesIterator.NotifyJobFailed(this);
                 }
 
-                if (!(await this.PushNextActivity()))
+                if (!(await this.SendNextActivity()))
                     this.Dispose();
             }
         }
@@ -119,7 +119,7 @@ namespace EmrWorkflow.Run
         /// <returns>True - activity was successfully sent to EMR,
         /// False - either no more activities or an erorr occured while sending a request to EMR
         /// </returns>
-        private async Task<bool> PushNextActivity()
+        private async Task<bool> SendNextActivity()
         {
             if (!this.activities.MoveNext())
             {

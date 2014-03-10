@@ -84,7 +84,7 @@
     <Compile Include="Utils\JsonSerializer.cs" />
     <Compile Include="Utils\TimerWorkerBase.cs" />
     <Compile Include="Run\Implementation\EmrJobLogger.cs" />
-    <Compile Include="Run\EmrJobRunner.cs" />
+    <Compile Include="Run\EmrActivitiesRunner.cs" />
     <Compile Include="Run\Implementation\EmrJobStateChecker.cs" />
     <Compile Include="Run\IEmrJobLogger.cs" />
     <Compile Include="Run\IEmrJobStateChecker.cs" />
