@@ -2,7 +2,7 @@
 
 namespace EmrWorkflow.SWF.Model
 {
-    class SwfEmrActivity
+    class SwfActivity
     {
         /// <summary>
         /// Name of the EMR Activity

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace EmrWorkflow.SWF.Model
 {
-    class ProcessActivityResult
+    class ProcessSwfActivityResult
     {
-        public SwfEmrActivity Output { get; set; }
+        public SwfActivity Output { get; set; }
 
         public string ErrorMessage { get; set; }
     }

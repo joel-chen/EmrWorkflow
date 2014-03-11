@@ -70,6 +70,24 @@ namespace EmrWorkflow {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Activity task &quot;{0}&quot; completed. JobFlowId: {1}..
+        /// </summary>
+        internal static string Info_ActivityCompletedTemplate {
+            get {
+                return ResourceManager.GetString("Info_ActivityCompletedTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to process activity for input &quot;{0}&quot;..
+        /// </summary>
+        internal static string Info_ActivityFailedTemplate {
+            get {
+                return ResourceManager.GetString("Info_ActivityFailedTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Emr job failed.
         /// </summary>
         internal static string Info_EmrJobFailed {
@@ -79,11 +97,11 @@ namespace EmrWorkflow {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to process activity for input \&quot;{0}\&quot;..
+        ///   Looks up a localized string similar to Polling for the SWF activity task....
         /// </summary>
-        internal static string Info_SwfActivityFailedTemplate {
+        internal static string Info_PollingActivityTask {
             get {
-                return ResourceManager.GetString("Info_SwfActivityFailedTemplate", resourceCulture);
+                return ResourceManager.GetString("Info_PollingActivityTask", resourceCulture);
             }
         }
     }

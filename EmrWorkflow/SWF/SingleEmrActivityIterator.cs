@@ -11,13 +11,13 @@ namespace EmrWorkflow.SWF
     /// <summary>
     /// Creates an iterator for one EMR Activity
     /// </summary>
-    class SwfSingleEmrActivityIterator : EmrActivitiesIteratorBase
+    class SingleEmrActivityIterator : EmrActivitiesIteratorBase
     {
         private EmrActivity emrActivity;
 
-        public SwfSingleEmrActivityIterator(SwfEmrActivity swfActivity)
+        public SingleEmrActivityIterator(SwfActivity swfActivity)
         {
-            this.emrActivity = SwfSingleEmrActivityIterator.CreateStrategy(swfActivity);
+            this.emrActivity = SingleEmrActivityIterator.CreateStrategy(swfActivity);
         }
 
         protected override IEnumerable<EmrActivity> GetNormalFlow(EmrActivitiesRunner emrRunner)
@@ -25,7 +25,7 @@ namespace EmrWorkflow.SWF
             yield return this.emrActivity;
         }
 
-        private static EmrActivity CreateStrategy(SwfEmrActivity swfActivity)
+        private static EmrActivity CreateStrategy(SwfActivity swfActivity)
         {
             XmlDocument xml = new XmlDocument();
             xml.Load(swfActivity.Name); //TODO: can be an extra logic for retrieving files, for example downloading from S3

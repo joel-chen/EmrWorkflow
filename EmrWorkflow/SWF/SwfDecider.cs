@@ -63,14 +63,14 @@ namespace EmrPlusSwf
         {
             List<Decision> decisions = new List<Decision>();
 
-            SwfEmrActivity latestActivity = null;
+            SwfActivity latestActivity = null;
             HistoryEvent latestEvent = task.Events[0];
             if (latestEvent.EventType == EventType.ActivityTaskCompleted)
             {
-                latestActivity = JsonSerializer.Deserialize<SwfEmrActivity>(latestEvent.ActivityTaskCompletedEventAttributes.Result);
+                latestActivity = JsonSerializer.Deserialize<SwfActivity>(latestEvent.ActivityTaskCompletedEventAttributes.Result);
             }
 
-            SwfEmrActivity nextActivity = this.CreateNextEmrActivity(latestActivity);
+            SwfActivity nextActivity = this.CreateNextEmrActivity(latestActivity);
 
             if (nextActivity == null)
                 decisions.Add(this.CreateCompleteWorkflowExecutionDecision());
@@ -80,7 +80,7 @@ namespace EmrPlusSwf
             return decisions;
         }
 
-        private Decision CreateActivityDecision(SwfEmrActivity nextActivity)
+        private Decision CreateActivityDecision(SwfActivity nextActivity)
         {
             Decision decision = new Decision()
             {
@@ -93,7 +93,7 @@ namespace EmrPlusSwf
                         Version = Constants.EmrJobActivityVersion
                     },
                     ActivityId = Constants.ActivityIdPrefix + DateTime.Now.TimeOfDay,
-                    Input = JsonSerializer.Serialize<SwfEmrActivity>(nextActivity)
+                    Input = JsonSerializer.Serialize<SwfActivity>(nextActivity)
                 }
             };
 
@@ -116,11 +116,11 @@ namespace EmrPlusSwf
             return decision;
         }
 
-        private SwfEmrActivity CreateNextEmrActivity(SwfEmrActivity previousActivity)
+        private SwfActivity CreateNextEmrActivity(SwfActivity previousActivity)
         {
             if (previousActivity == null)
             {
-                return new SwfEmrActivity()
+                return new SwfActivity()
                 {
                     Name = "startCluster",
                     Type = EmrActivityType.StartJob
@@ -130,14 +130,14 @@ namespace EmrPlusSwf
             switch (previousActivity.Name)
             {
                 case "startCluster":
-                    return new SwfEmrActivity()
+                    return new SwfActivity()
                     {
                         Name = "runSteps",
                         JobFlowId = previousActivity.JobFlowId,
                         Type = EmrActivityType.AddSteps
                     };
                 case "runSteps":
-                    return new SwfEmrActivity()
+                    return new SwfActivity()
                     {
                         Name = "terminateCluster",
                         JobFlowId = previousActivity.JobFlowId,

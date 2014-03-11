@@ -79,8 +79,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SwfResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SWF\Model\ProcessActivityResult.cs" />
-    <Compile Include="SWF\SwfSingleEmrActivityIterator.cs" />
+    <Compile Include="SWF\Model\ProcessSwfActivityResult.cs" />
+    <Compile Include="SWF\SingleEmrActivityIterator.cs" />
     <Compile Include="Utils\JsonSerializer.cs" />
     <Compile Include="Utils\TimerWorkerBase.cs" />
     <Compile Include="Run\Implementation\EmrJobLogger.cs" />
@@ -96,9 +96,9 @@
     <Compile Include="Run\Activities\TerminateJobActivity.cs" />
     <Compile Include="Run\Model\EmrActivityType.cs" />
     <Compile Include="SWF\Model\Constants.cs" />
-    <Compile Include="SWF\Model\SwfEmrActivity.cs" />
-    <Compile Include="SWF\SwfEmrJobActivityProcessor.cs" />
-    <Compile Include="SWF\SwfEmrJobDecider.cs" />
+    <Compile Include="SWF\Model\SwfActivity.cs" />
+    <Compile Include="SWF\SwfActivitiesRunner.cs" />
+    <Compile Include="SWF\SwfDecider.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">

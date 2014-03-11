@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace EmrWorkflow.SWF
 {
-    public class SwfEmrJobActivityProcessor : TimerWorkerBase<bool>
+    public class SwfActivitiesRunner : TimerWorkerBase<bool>
     {
         /// <summary>
         /// Constructor for injecting dependencies
@@ -20,7 +20,7 @@ namespace EmrWorkflow.SWF
         /// <param name="settings">Settings to replace placeholders</param>
         /// <param name="emrClient">Instantiated EMR Client to make requests to the Amazon EMR Service</param>
         /// <param name="swfClient">Instantiated SWF Client to make requests to the Amazon SWF Service</param>
-        public SwfEmrJobActivityProcessor(IEmrJobLogger emrJobLogger, IEmrJobStateChecker emrJobStateChecker, IBuilderSettings settings, IAmazonElasticMapReduce emrClient, IAmazonSimpleWorkflow swfClient)
+        public SwfActivitiesRunner(IEmrJobLogger emrJobLogger, IEmrJobStateChecker emrJobStateChecker, IBuilderSettings settings, IAmazonElasticMapReduce emrClient, IAmazonSimpleWorkflow swfClient)
         {
             this.EmrJobLogger = emrJobLogger;
             this.EmrJobStateChecker = emrJobStateChecker;
@@ -59,7 +59,7 @@ namespace EmrWorkflow.SWF
             ActivityTask activityTask = await this.Poll();
             if (!String.IsNullOrEmpty(activityTask.TaskToken))
             {
-                ProcessActivityResult processResult = await ProcessTask(activityTask.Input);
+                ProcessSwfActivityResult processResult = await ProcessTask(activityTask.Input);
 
                 if (string.IsNullOrEmpty(processResult.ErrorMessage))
                     await CompleteTask(activityTask.TaskToken, processResult.Output);
@@ -70,7 +70,7 @@ namespace EmrWorkflow.SWF
 
         private async Task<ActivityTask> Poll()
         {
-            EmrJobLogger.PrintInfo("Polling for activity task ...");
+            EmrJobLogger.PrintInfo(SwfResources.Info_PollingActivityTask);
             PollForActivityTaskRequest request = new PollForActivityTaskRequest()
             {
                 Domain = Constants.EmrJobDomain,
@@ -84,15 +84,23 @@ namespace EmrWorkflow.SWF
             return response.ActivityTask;
         }
 
-        private async Task<ProcessActivityResult> ProcessTask(string input)
+        /// <summary>
+        /// Process activity task
+        /// </summary>
+        /// <param name="input">Input for the activity task</param>
+        /// <returns>Processing result: either an updated SWF activity, or an error message</returns>
+        private async Task<ProcessSwfActivityResult> ProcessTask(string input)
         {
-            ProcessActivityResult result = new ProcessActivityResult();
+            ProcessSwfActivityResult result = new ProcessSwfActivityResult();
 
             try
             {
-                SwfEmrActivity swfActivity = JsonSerializer.Deserialize<SwfEmrActivity>(input);
-                SwfSingleEmrActivityIterator singleEmrActivityIterator = new SwfSingleEmrActivityIterator(swfActivity);
+                //read SWF activity info
+                SwfActivity swfActivity = JsonSerializer.Deserialize<SwfActivity>(input);
+                //based on SWF activity's info create an EMR activity
+                SingleEmrActivityIterator singleEmrActivityIterator = new SingleEmrActivityIterator(swfActivity);
 
+                //Run this activity on EMR Service
                 using (EmrActivitiesRunner emrRunner = new EmrActivitiesRunner(this.EmrJobLogger, this.EmrJobStateChecker, this.EmrClient, this.Settings, singleEmrActivityIterator))
                 {
                     emrRunner.JobFlowId = swfActivity.JobFlowId; //set JobFlowId for the current activity
@@ -127,19 +135,19 @@ namespace EmrWorkflow.SWF
             };
 
             RespondActivityTaskFailedResponse response = await this.SwfClient.RespondActivityTaskFailedAsync(request);
-            this.EmrJobLogger.PrintInfo(string.Format(SwfResources.Info_SwfActivityFailedTemplate, input));
+            this.EmrJobLogger.PrintInfo(string.Format(SwfResources.Info_ActivityFailedTemplate, input));
         }
 
-        private async Task CompleteTask(String taskToken, SwfEmrActivity swfActivity)
+        private async Task CompleteTask(String taskToken, SwfActivity swfActivity)
         {
             RespondActivityTaskCompletedRequest request = new RespondActivityTaskCompletedRequest()
             {
-                Result = JsonSerializer.Serialize<SwfEmrActivity>(swfActivity),
+                Result = JsonSerializer.Serialize<SwfActivity>(swfActivity),
                 TaskToken = taskToken
             };
 
             RespondActivityTaskCompletedResponse response = await this.SwfClient.RespondActivityTaskCompletedAsync(request);
-            this.EmrJobLogger.PrintInfo(string.Format("Activity task \"{0}\" completed. JobFlowId: {1}." , swfActivity.Name, swfActivity.JobFlowId));
+            this.EmrJobLogger.PrintInfo(string.Format(SwfResources.Info_ActivityCompletedTemplate , swfActivity.Name, swfActivity.JobFlowId));
         }
 
         protected override bool WorkerResult

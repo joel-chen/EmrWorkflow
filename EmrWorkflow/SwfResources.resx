@@ -120,10 +120,16 @@
   <data name="E_UnsupportedEmrActivityTypeTemplate" xml:space="preserve">
     <value>Unsupported EMR Activty type "{0}"</value>
   </data>
+  <data name="Info_ActivityCompletedTemplate" xml:space="preserve">
+    <value>Activity task "{0}" completed. JobFlowId: {1}.</value>
+  </data>
+  <data name="Info_ActivityFailedTemplate" xml:space="preserve">
+    <value>Failed to process activity for input "{0}".</value>
+  </data>
   <data name="Info_EmrJobFailed" xml:space="preserve">
     <value>Emr job failed</value>
   </data>
-  <data name="Info_SwfActivityFailedTemplate" xml:space="preserve">
-    <value>Failed to process activity for input \"{0}\".</value>
+  <data name="Info_PollingActivityTask" xml:space="preserve">
+    <value>Polling for the SWF activity task...</value>
   </data>
 </root>
