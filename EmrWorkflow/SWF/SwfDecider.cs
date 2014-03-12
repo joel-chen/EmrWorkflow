@@ -1,5 +1,6 @@
 ﻿using Amazon.SimpleWorkflow;
 using Amazon.SimpleWorkflow.Model;
+using EmrWorkflow;
 using EmrWorkflow.Run;
 using EmrWorkflow.Run.Model;
 using EmrWorkflow.SWF.Model;
@@ -42,13 +43,13 @@ namespace EmrPlusSwf
                 List<Decision> decisions = this.Decide(task);
 
                 //Complete the task with the new set of decisions
-                //CompleteTask(task.TaskToken, decisions);
+                await CompleteTask(task.TaskToken, decisions);
             }
         }
 
         private async Task<DecisionTask> Poll()
         {
-            this.EmrJobLogger.PrintInfo("Polling for decision task ...");
+            this.EmrJobLogger.PrintInfo(SwfResources.Info_PollingDecisionTask);
             PollForDecisionTaskRequest request = new PollForDecisionTaskRequest()
             {
                 Domain = Constants.EmrJobDomain,
@@ -78,6 +79,17 @@ namespace EmrPlusSwf
                 decisions.Add(this.CreateActivityDecision(nextActivity));
 
             return decisions;
+        }
+
+        private async Task CompleteTask(string taskToken, List<Decision> decisions)
+        {
+            RespondDecisionTaskCompletedRequest request = new RespondDecisionTaskCompletedRequest()
+            {
+                Decisions = decisions,
+                TaskToken = taskToken
+            };
+
+            await this.SwfClient.RespondDecisionTaskCompletedAsync(request);
         }
 
         private Decision CreateActivityDecision(SwfActivity nextActivity)
@@ -112,7 +124,7 @@ namespace EmrPlusSwf
                 }
             };
 
-            this.EmrJobLogger.PrintInfo("Decision: Complete Workflow Execution");
+            this.EmrJobLogger.PrintInfo(SwfResources.Info_DecisionSwfCompleted);
             return decision;
         }
 

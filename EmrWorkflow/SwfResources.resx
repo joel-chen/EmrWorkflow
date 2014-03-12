@@ -126,10 +126,16 @@
   <data name="Info_ActivityFailedTemplate" xml:space="preserve">
     <value>Failed to process activity for input "{0}".</value>
   </data>
+  <data name="Info_DecisionSwfCompleted" xml:space="preserve">
+    <value>Decision: Complete Workflow Execution</value>
+  </data>
   <data name="Info_EmrJobFailed" xml:space="preserve">
     <value>Emr job failed</value>
   </data>
   <data name="Info_PollingActivityTask" xml:space="preserve">
     <value>Polling for the SWF activity task...</value>
+  </data>
+  <data name="Info_PollingDecisionTask" xml:space="preserve">
+    <value>Polling for the SWF decision task...</value>
   </data>
 </root>

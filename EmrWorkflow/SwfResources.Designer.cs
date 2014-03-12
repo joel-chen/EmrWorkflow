@@ -88,6 +88,15 @@ namespace EmrWorkflow {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Decision: Complete Workflow Execution.
+        /// </summary>
+        internal static string Info_DecisionSwfCompleted {
+            get {
+                return ResourceManager.GetString("Info_DecisionSwfCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Emr job failed.
         /// </summary>
         internal static string Info_EmrJobFailed {
@@ -102,6 +111,15 @@ namespace EmrWorkflow {
         internal static string Info_PollingActivityTask {
             get {
                 return ResourceManager.GetString("Info_PollingActivityTask", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Polling for the SWF decision task....
+        /// </summary>
+        internal static string Info_PollingDecisionTask {
+            get {
+                return ResourceManager.GetString("Info_PollingDecisionTask", resourceCulture);
             }
         }
     }
