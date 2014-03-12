@@ -20,13 +20,15 @@ namespace EmrWorkflow.SWF
         /// <param name="settings">Settings to replace placeholders</param>
         /// <param name="emrClient">Instantiated EMR Client to make requests to the Amazon EMR Service</param>
         /// <param name="swfClient">Instantiated SWF Client to make requests to the Amazon SWF Service</param>
-        public SwfActivitiesRunner(IEmrJobLogger emrJobLogger, IEmrJobStateChecker emrJobStateChecker, IBuilderSettings settings, IAmazonElasticMapReduce emrClient, IAmazonSimpleWorkflow swfClient)
+        /// <param name="swfConfiguration">Instantiated object that provides configuration info for the current SWF</param>
+        public SwfActivitiesRunner(IEmrJobLogger emrJobLogger, IEmrJobStateChecker emrJobStateChecker, IBuilderSettings settings, IAmazonElasticMapReduce emrClient, IAmazonSimpleWorkflow swfClient, ISwfConfiguration swfConfiguration)
         {
             this.EmrJobLogger = emrJobLogger;
             this.EmrJobStateChecker = emrJobStateChecker;
             this.Settings = settings;
             this.EmrClient = emrClient;
             this.SwfClient = swfClient;
+            this.SwfConfiguration = swfConfiguration;
         }
 
         /// <summary>
@@ -54,6 +56,11 @@ namespace EmrWorkflow.SWF
         /// </summary>
         public IAmazonSimpleWorkflow SwfClient { get; set; }
 
+        /// <summary>
+        /// Object that provides configuration info for the current SWF
+        /// </summary>
+        public ISwfConfiguration SwfConfiguration { get; set; }
+
         protected async override void DoWorkSafe()
         {
             ActivityTask activityTask = await this.Poll();
@@ -73,11 +80,8 @@ namespace EmrWorkflow.SWF
             EmrJobLogger.PrintInfo(SwfResources.Info_PollingActivityTask);
             PollForActivityTaskRequest request = new PollForActivityTaskRequest()
             {
-                Domain = Constants.EmrJobDomain,
-                TaskList = new TaskList()
-                {
-                    Name = Constants.EmrJobTasksList
-                }
+                Domain = this.SwfConfiguration.DomainName,
+                TaskList = new TaskList() { Name = this.SwfConfiguration.ActivityTasksList }
             };
 
             PollForActivityTaskResponse response = await this.SwfClient.PollForActivityTaskAsync(request);

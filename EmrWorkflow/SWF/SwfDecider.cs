@@ -1,6 +1,5 @@
 ﻿using Amazon.SimpleWorkflow;
 using Amazon.SimpleWorkflow.Model;
-using EmrWorkflow;
 using EmrWorkflow.Run;
 using EmrWorkflow.Run.Model;
 using EmrWorkflow.SWF.Model;
@@ -9,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace EmrPlusSwf
+namespace EmrWorkflow.SWF
 {
     public class SwfEmrJobDecider : TimerWorkerBase<bool>
     {
@@ -18,10 +17,12 @@ namespace EmrPlusSwf
         /// </summary>
         /// <param name="emrJobLogger">Instantiated object to log information about the EMR Job</param>
         /// <param name="swfClient">Instantiated SWF Client to make requests to the Amazon SWF Service</param>
-        public SwfEmrJobDecider(IEmrJobLogger emrJobLogger, IAmazonSimpleWorkflow swfClient)
+        /// <param name="swfConfiguration">Instantiated object that provides configuration info for the current SWF</param>
+        public SwfEmrJobDecider(IEmrJobLogger emrJobLogger, IAmazonSimpleWorkflow swfClient, ISwfConfiguration swfConfiguration)
         {
             this.EmrJobLogger = emrJobLogger;
             this.SwfClient = swfClient;
+            this.SwfConfiguration = swfConfiguration;
         }
 
         /// <summary>
@@ -33,6 +34,11 @@ namespace EmrPlusSwf
         /// SWF Client to make requests to the Amazon SWF Service
         /// </summary>
         public IAmazonSimpleWorkflow SwfClient { get; set; }
+
+        /// <summary>
+        /// Object that provides configuration info for the current SWF
+        /// </summary>
+        public ISwfConfiguration SwfConfiguration { get; set; }
 
         protected async override void DoWorkSafe()
         {
@@ -52,8 +58,8 @@ namespace EmrPlusSwf
             this.EmrJobLogger.PrintInfo(SwfResources.Info_PollingDecisionTask);
             PollForDecisionTaskRequest request = new PollForDecisionTaskRequest()
             {
-                Domain = Constants.EmrJobDomain,
-                TaskList = new TaskList() { Name = Constants.EmrJobTasksList }
+                Domain = this.SwfConfiguration.DomainName,
+                TaskList = new TaskList() { Name = this.SwfConfiguration.DecisionTasksList }
             };
 
             PollForDecisionTaskResponse response = await this.SwfClient.PollForDecisionTaskAsync(request);
@@ -101,10 +107,10 @@ namespace EmrPlusSwf
                 {
                     ActivityType = new ActivityType()
                     {
-                        Name = Constants.EmrJobActivityName,
-                        Version = Constants.EmrJobActivityVersion
+                        Name = this.SwfConfiguration.ActivityName,
+                        Version = this.SwfConfiguration.ActivityVersion
                     },
-                    ActivityId = Constants.ActivityIdPrefix + DateTime.Now.TimeOfDay,
+                    ActivityId = this.SwfConfiguration.ActivityIdPrefix + DateTime.Now.TimeOfDay,
                     Input = JsonSerializer.Serialize<SwfActivity>(nextActivity)
                 }
             };
