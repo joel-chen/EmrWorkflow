@@ -46,8 +46,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DemoEmrActivitiesEnumerator.cs" />
+    <Compile Include="EmrActivitiesRunnerExample.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SwfRunnerExample.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EmrWorkflow\EmrWorkflow.csproj">

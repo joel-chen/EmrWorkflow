@@ -1,6 +1,6 @@
 ﻿using EmrWorkflow.Run;
-using EmrWorkflow.Run.Model;
 using EmrWorkflow.Run.Activities;
+using EmrWorkflow.Run.Model;
 using EmrWorkflow.SWF.Model;
 using System;
 using System.Collections.Generic;
@@ -28,7 +28,7 @@ namespace EmrWorkflow.SWF
         private static EmrActivity CreateStrategy(SwfActivity swfActivity)
         {
             XmlDocument xml = new XmlDocument();
-            xml.Load(swfActivity.Name); //TODO: can be an extra logic for retrieving files, for example downloading from S3
+            xml.Load(swfActivity.Path);
 
             switch (swfActivity.Type)
             {
