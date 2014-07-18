@@ -4,16 +4,13 @@ using EmrWorkflow.RequestBuilders;
 using EmrWorkflow.Run;
 using EmrWorkflow.Run.Implementation;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace EmrWorkflowDemo
 {
     class EmrActivitiesRunnerExample
     {
-        public async void Run(TaskCompletionSource<bool> taskCompletionSource)
+        public async Task<bool> Run()
         {
             //Create dependencies
             IBuilderSettings settings = this.CreateSettings();
@@ -27,8 +24,7 @@ namespace EmrWorkflowDemo
                 //explicitly set an existing jobFlowId, if you want to work with an existing job
                 //emrRunner.JobFlowId = "j-36G3NHTVEP1Q7";
 
-                bool result = await emrRunner.Start();
-                taskCompletionSource.SetResult(result);
+                return await emrRunner.Start();
             }
         }
 
@@ -39,7 +35,7 @@ namespace EmrWorkflowDemo
         public BuilderSettings CreateSettings()
         {
             BuilderSettings settings = new BuilderSettings();
-            settings.Put("s3Bucket", "s3://myBucket/emr");
+            settings.Put("s3Bucket", "s3://3d-geometry-emr/Natalia");
             return settings;
         }
 

@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DemoEmrActivitiesEnumerator.cs" />
+    <Compile Include="DemoSwfConfiguration.cs" />
     <Compile Include="EmrActivitiesRunnerExample.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

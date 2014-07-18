@@ -36,7 +36,7 @@ namespace EmrWorkflow.SWF
         /// </summary>
         public ISwfConfiguration SwfConfiguration { get; set; }
 
-        public async void Setup()
+        public async Task SetupAsync()
         {
             await this.CreateDomain();
             await this.CreateActivity();

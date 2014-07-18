@@ -99,7 +99,7 @@
     <Compile Include="Run\Model\EmrActivityType.cs" />
     <Compile Include="SWF\Model\SwfActivity.cs" />
     <Compile Include="SWF\SwfActivitiesRunner.cs" />
-    <Compile Include="SWF\SwfDecider.cs" />
+    <Compile Include="SWF\SwfEmrJobDecider.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
